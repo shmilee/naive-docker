@@ -1,4 +1,4 @@
-# Use monit to manage mynginx + aria2 + v2ray processes
+# Use monit to manage mynginx + aria2 + v2ray + lua json + redis processes
 #
 # docker build --force-rm --no-cache --rm -t shmilee/naive:$(date +%y%m%d) .
 #
@@ -24,10 +24,11 @@ RUN echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.9/main >> /etc/apk/repos
  && echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.9/community >> /etc/apk/repositories \
  && addgroup -g 82 -S www-data \
  && adduser -u 82 -D -S -h /srv/http -G www-data -g www-data www-data \
- && echo "==> tini monit mynginx ..." \
+ && echo "==> tini monit mynginx aria2 cjson redis..." \
  && apk --no-cache add coreutils bash nano tzdata ca-certificates openssl \
         tini monit iproute2 \
-        mynginx mynginx-meta-small-modules aria2 \
+        mynginx mynginx-meta-small-modules \
+        aria2 lua5.1-cjson redis\
  && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
  && echo "${TIMEZONE}" > /etc/timezone \
  && echo "==> v2ray ..." \
