@@ -1,0 +1,19 @@
+server {
+    listen  443 ssl http2;
+    server_name www.{{domain-name}};
+
+    ssl_certificate       /srv/etc/ssl-certs/server-www.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-www.key;
+    access_log  /srv/log/nginx-www-access.log main buffer=32k flush=2m;
+    error_log   /srv/log/nginx-www-error.log notice;
+
+    location / {
+        root   /usr/share/doc/python3/html;
+        index  index.html index.htm;
+    }
+
+    location /status {
+        stub_status on;
+        access_log on;
+    }
+}
