@@ -1,0 +1,25 @@
+server {
+    listen  443 ssl http2;
+    server_name ariang.{{domain-name}};
+
+    ssl_certificate       /srv/etc/ssl-certs/server-ariang.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-ariang.key;
+    access_log  /srv/log/nginx-ariang-access.log main buffer=32k flush=2m;
+    error_log   /srv/log/nginx-ariang-error.log notice;
+
+    location / {
+        root   /srv/ariang;
+        index  index.html;
+    }
+
+    location /aria2-jsonrpc {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:6800/jsonrpc;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

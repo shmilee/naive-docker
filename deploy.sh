@@ -15,6 +15,10 @@ EOF
     exit 1
 fi
 
+
+#https://github.com/mayswind/AriaNg/releases/download/1.1.1/AriaNg-1.1.1.zip
+
+
 [ -d v2ray-deploy ] && rm -r v2ray-deploy/
 
 echo "==> copy etc files ..."
