@@ -1,7 +1,7 @@
 Intro
 =====
 
-Use **n**ginx, **a**r**i**a2, **v**2ray to get data from somewher**e**. "拿衣服"
+Use **N**ginx, **A**r**I**a2, **V**2ray to get data from somewher**E**. "拿衣服"
 
 docker image
 ============

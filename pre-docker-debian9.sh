@@ -10,7 +10,7 @@ apt-cache policy docker-ce
 apt-get install docker-ce
 systemctl status docker # should enabled
 echo "==> pull shmilee/naive"
-docker push shmilee/naive:${1:-190703}
-docker tag shmilee/naive:using
+docker pull shmilee/naive:${1:-190703}
+docker tag shmilee/naive:${1:-190703} shmilee/naive:using
 echo "==> add other pkgs"
 apt-get install tig htop zsh vim python3-doc
