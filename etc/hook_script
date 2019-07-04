@@ -1,4 +1,13 @@
 #!/bin/bash
 echo "[hook_script] $0"
+
 chown root:root /srv/etc/monitrc
 chmod 600 /srv/etc/monitrc
+
+chown -R www-data:www-data /srv/http/{.aria2,aria2-download,ariang}
+touch /srv/log/aria2.log
+chown www-data:www-data /srv/log/aria2.log
+
+touch /srv/log/v2ray-{access,error}.log
+chown nobody:nobody /srv/log/v2ray-access.log
+chown nobody:nobody /srv/log/v2ray-error.log

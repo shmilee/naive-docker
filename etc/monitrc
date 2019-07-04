@@ -17,7 +17,7 @@ set eventqueue
 set httpd port 2812
     use address 127.0.0.1
     allow 127.0.0.1
-    allow admin:'adminpassword'
+    allow admin:'adminpassword' # read-only
 
 ###############################################################################
 ## Services
@@ -36,8 +36,31 @@ check process mynginx with pidfile /run/mynginx.pid
     if 3 restarts within 3 cycles then alert
     group webserver
 
-check process v2ray matching "v2ray.*/etc/v2ray/config.json"
-    start program = "/bin/bash -c 'nohup v2ray -config /etc/v2ray/config.json &'"
+check process aria2c matching "aria2c.*daemon"
+    start program = "/usr/bin/aria2c --daemon true"
+        as uid www-data and gid www-data
+        with timeout 10 seconds
+    stop program = "/usr/bin/killall aria2c"
+        as uid www-data and gid www-data
+    if failed port 6800 with timeout 10 seconds then restart
+    if 3 restarts within 3 cycles then alert
+    group webserver
+
+check process v2ray matching "v2ray.*/srv/etc/v2ray-server-config.json"
+    start program = "/bin/bash -c 'nohup v2ray -config /srv/etc/v2ray-server-config.json >/dev/null &'"
+        as uid nobody and gid nobody
     stop program = "/usr/bin/killall v2ray"
+        as uid nobody and gid nobody
     if cpu usage > 85% for 10 cycles then restart
     group proxy
+
+
+#check process redis-server matching "redis-server.*daemonize"
+#    start program = "/usr/bin/redis-server --daemonize yes"
+#        as uid nobody and gid nobody
+#        with timeout 10 seconds
+#    stop program = "/usr/bin/redis-cli shutdown"
+#        as uid nobody and gid nobody
+#    if failed port 6379 protocol redis with timeout 10 seconds then restart
+#    if 3 restarts within 3 cycles then alert
+#    group database
