@@ -49,4 +49,6 @@ ls "$(date +%F)-deploy"
   - self-signed, Full
   - valid & trusted by Cloudflare, Full (strict)
 
-* download v2ray client config `20XX-XX-XX-deploy/etc/v2ray-client-config.json`
+* download
+  - aria2 token, user, passwd `20XX-XX-XX-deploydir/aria2-user-info`
+  - v2ray client config `20XX-XX-XX-deploy/v2ray-client-config.json`

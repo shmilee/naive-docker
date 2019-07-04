@@ -33,6 +33,10 @@ aria2token=$(cat /proc/sys/kernel/random/uuid)
 sed -i "s|{{ARIA2TOKEN}}|$aria2token|" $deploydir/etc/aria2.conf
 mv $deploydir/etc/aria2.conf $deploydir/http/.aria2/
 touch $deploydir/http/.aria2/aria2.session
+auser=$(cat /proc/sys/kernel/random/uuid | cut -d- -f2,3)
+apass=$(cat /proc/sys/kernel/random/uuid | cut -d- -f1,5)
+printf "$auser:$(openssl passwd -crypt $apass)\n" > $deploydir/etc/http-passwd
+echo -e "token: $aria2token\nuser: $auser\npasswd: $apass" > $deploydir/aria2-user-info
 if [ ! -f AriaNg-$ariang_ver.zip ]; then
     wget -c https://github.com/mayswind/AriaNg/releases/download/$ariang_ver/AriaNg-$ariang_ver.zip
 fi
@@ -51,6 +55,7 @@ sed -e "s|{{UUID1}}|${uuid1}|" -e "s|{{UUID2}}|${uuid2}|" \
     -e "s|{{ip-addr}}|$ipaddr|" -e "s|{{port1}}|$port|" \
     -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
     -i $deploydir/etc/v2ray-client-config.json
+mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 
 echo "==> gen $deploydir/{test.sh,run.sh}"
 cat <<'EOF' | sed "s|{{port1}}|$port|g" > $deploydir/test.sh
@@ -76,4 +81,7 @@ Run test
     ./test.sh [naive-image-tag]
 If containers run scucessfully, then
     ./run.sh [naive-image-tag]
+Some important information!
+    $deploydir/aria2-user-info
+    $deploydir/v2ray-client-config.json
 EOF

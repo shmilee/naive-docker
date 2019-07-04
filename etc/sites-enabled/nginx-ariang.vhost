@@ -20,6 +20,8 @@ server {
     }
 
     location ^~ /aria2-download {
+        auth_basic "Apples and oranges for ariang.";
+        auth_basic_user_file /srv/etc/http-passwd;
         root  /srv/http;
         fancyindex on;
         fancyindex_exact_size off;
