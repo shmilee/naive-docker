@@ -22,11 +22,26 @@ docker push shmilee/naive:$(date +%y%m%d)
 deploy nginx, aria2 and v2ray
 =============================
 
-generate `dhparam.pem` `server-{ariang,v2ray,www}.{crt,key}` for nginx
+### clone repo
+
+```
+git clone https://github.com/shmilee/naive-docker.git
+cd naive-docker/
+```
+
+### pre docker in vps
+
+example in debian 9, run as root
+
+```
+bash ./pre-docker-debian9.sh
+```
+
+### deploy
 
 ```
 bash ./deploy.sh ip-addr [domain]
-ls deploy/
+ls "$(date +%F)-deploy"
 ```
 
-* download v2ray client config `deploy/v2ray-client-config.json`
+* download v2ray client config `20XX-XX-XX-deploy/etc/v2ray-client-config.json`

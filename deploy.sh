@@ -1,71 +1,79 @@
 #!/bin/bash
 
 ipaddr=${1}
-port=${2:-$RANDOM}
-domain=${3:-$ipaddr}
-v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
+domain=${2:-$ipaddr}
 
 if [ -z $ipaddr ];then
     cat <<EOF
-usage: $0 ip-addr [port] [domain]
-default:
-  port       \$RANDOM
-  domain     ip-addr
+usage: $0 ip-addr [domain]
+default domain is ip-addr
 EOF
     exit 1
 fi
 
+port=$RANDOM
+v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
+deploydir="$(date +%F)-deploy"
+ariang_ver=1.1.1
 
-#https://github.com/mayswind/AriaNg/releases/download/1.1.1/AriaNg-1.1.1.zip
-
-
-[ -d v2ray-deploy ] && rm -r v2ray-deploy/
-
+if [ -d $deploydir ];then
+    echo "Do yourself! sudo rm -rf $deploydir/"
+    exit 2
+fi
+mkdir $deploydir
 echo "==> copy etc files ..."
-mkdir -pv v2ray-deploy/etc/ssl-certs
-cp -r modules-enabled sites-enabled monitrc ../etc/nginx.conf v2ray-deploy/etc/
-chmod 600 v2ray-deploy/etc/monitrc
-#sudo chown -v 0:0 v2ray-deploy/etc/monitrc
-sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" v2ray-deploy/etc/sites-enabled/nginx-*.vhost
+cp -r etc $deploydir/
 
-echo "==> log dir ..."
-mkdir v2ray-deploy/log
+#1. nginx
+sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" $deploydir/etc/sites-enabled/nginx-*.vhost
 
-echo "==> v2ray config ..."
+#2. aria2
+mkdir -pv $deploydir/http/{.aria2,aria2-download,ariang}
+aria2token=$(cat /proc/sys/kernel/random/uuid)
+sed -i "s|{{ARIA2TOKEN}}|$aria2token|" $deploydir/etc/aria2.conf
+mv $deploydir/etc/aria2.conf $deploydir/http/.aria2/
+touch $deploydir/http/.aria2/aria2.session
+if [ ! -f AriaNg-$ariang_ver.zip ]; then
+    wget -c https://github.com/mayswind/AriaNg/releases/download/$ariang_ver/AriaNg-$ariang_ver.zip
+fi
+echo "==> extract ariang files ..."
+unzip -q ./AriaNg-$ariang_ver.zip -d $deploydir/http/ariang
+
+#3. v2ray
+echo "==> edit v2ray config ..."
 uuid1=$(cat /proc/sys/kernel/random/uuid)
 uuid2=$(cat /proc/sys/kernel/random/uuid)
-#uuid1='x-x-x-x-x' # test
-#uuid2='x-x-x-x-x'
 sed -e "s|{{UUID1}}|${uuid1}|" -e "s|{{UUID2}}|${uuid2}|" \
     -e "s|{{port1}}|$port|" \
     -e "s|{{v2raypath}}|$v2raypath|" \
-    v2ray-server-config.json > v2ray-deploy/v2ray-server-config.json
+    -i $deploydir/etc/v2ray-server-config.json
 sed -e "s|{{UUID1}}|${uuid1}|" -e "s|{{UUID2}}|${uuid2}|" \
     -e "s|{{ip-addr}}|$ipaddr|" -e "s|{{port1}}|$port|" \
     -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
-    v2ray-client-config.json > v2ray-deploy/v2ray-client-config.json
+    -i $deploydir/etc/v2ray-client-config.json
 
-echo "==> v2ray-deploy/{test.sh,run.sh}"
-
-cat <<'EOF' | sed "s|{{port1}}|$port|g" > v2ray-deploy/test.sh
+echo "==> gen $deploydir/{test.sh,run.sh}"
+cat <<'EOF' | sed "s|{{port1}}|$port|g" > $deploydir/test.sh
 #!/bin/bash
-docker run --rm --name nginx_v2ray \
+#    -v /usr/share/doc/python/html:/usr/share/doc/python3/html \
+docker run --rm --name naive \
     -p 80:80 -p 443:443 -p {{port1}}:{{port1}} \
-    -v $PWD/etc:/srv/etc:ro \
-    -v $PWD/v2ray-server-config.json:/etc/v2ray/config.json:ro \
-    -v $PWD/log:/srv/log:rw \
-    shmilee/v2ray:${1:-using}
+    -v $PWD:/srv:rw \
+    shmilee/naive:${1:-using}
 EOF
-sed 's|--rm|--detach --restart=always|'  v2ray-deploy/test.sh > v2ray-deploy/run.sh
-chmod +x v2ray-deploy/{test.sh,run.sh}
+sed 's|--rm|--detach --restart=always|'  $deploydir/test.sh > $deploydir/run.sh
+chmod +x $deploydir/{test.sh,run.sh}
+
+echo "==> log dir ..."
+mkdir $deploydir/log
 
 echo "==> Done."
-cat <<'EOF'
+cat <<EOF
 
-1. Put dhparam.pem server-v2ray.{crt,key} in v2ray-deploy/etc/ssl-certs
-   Test nginx and v2ray
-   $ cd  v2ray-deploy/
-   $ ./test.sh [v2ray-image-tag]
-
-2. If containers run scucessfully, Run './run.sh [v2ray-image-tag]'
+Generate and put dhparam.pem server-{ariang,v2ray,www}.{crt,key} in $deploydir/etc/ssl-certs
+Run test
+    cd  $deploydir/
+    ./test.sh [naive-image-tag]
+If containers run scucessfully, then
+    ./run.sh [naive-image-tag]
 EOF
