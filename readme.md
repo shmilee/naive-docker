@@ -44,4 +44,9 @@ bash ./deploy.sh ip-addr [domain]
 ls "$(date +%F)-deploy"
 ```
 
+* Note: [SSL certificates, Cloudflare SSL options](https://support.cloudflare.com/hc/en-us/articles/200170416-End-to-end-HTTPS-with-Cloudflare-Part-3-SSL-options)
+  - no certificate, Off & Flexible **not recommended**
+  - self-signed, Full
+  - valid & trusted by Cloudflare, Full (strict)
+
 * download v2ray client config `20XX-XX-XX-deploy/etc/v2ray-client-config.json`
