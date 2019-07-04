@@ -1,4 +1,11 @@
 server {
+    listen       80;
+    server_name  ariang.{{domain-name}};
+    # enforce https
+    return 301 https://$server_name$request_uri;
+}
+
+server {
     listen  443 ssl http2;
     server_name ariang.{{domain-name}};
 
@@ -8,8 +15,16 @@ server {
     error_log   /srv/log/nginx-ariang-error.log notice;
 
     location / {
-        root   /srv/ariang;
+        root   /srv/http/ariang;
         index  index.html;
+    }
+
+    location ^~ /aria2-download {
+        root  /srv/http;
+        fancyindex on;
+        fancyindex_exact_size off;
+        fancyindex_localtime on;
+        include    /etc/mynginx/mime.types;
     }
 
     location /aria2-jsonrpc {
