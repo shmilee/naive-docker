@@ -41,24 +41,6 @@
     {
       "protocol": "freedom",  // 主传出协议
       "settings": {}
-    },
-    {
-      "protocol": "freedom",
-      "settings": {
-        "domainStrategy": "UseIPv4"
-      },
-      "tag": "ipv4-out"
     }
-  ],
-  "routing": {
-    "rules": [
-      {
-        "type": "field",
-        "domain": [
-          "domain:google.com"
-        ],
-        "outboundTag": "ipv4-out"
-      }
-    ]
-  }
+  ]
 }
