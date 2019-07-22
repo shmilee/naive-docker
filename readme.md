@@ -52,3 +52,8 @@ ls "$(date +%F)-deploy"
 * download
   - aria2 token, user, passwd `20XX-XX-XX-deploydir/aria2-user-info`
   - v2ray client config `20XX-XX-XX-deploy/v2ray-client-config.json`
+
+### optional optimization
+
+* `turn-on-tcp_bbr.sh`
+* `turn-on-tcp_fastopen.sh`
