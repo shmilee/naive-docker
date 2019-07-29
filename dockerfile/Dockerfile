@@ -11,7 +11,7 @@ ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     TIMEZONE=Asia/Shanghai \
     TERM=xterm-color \
     V2RAY_LOCATION_ASSET=/etc/v2ray \
-    V2RAY_VERSION=4.19.1 \
+    V2RAY_VERSION=4.20.0 \
     V2RAY_ZIP_URL=https://github.com/v2ray/v2ray-core/releases/download/v%s/v2ray-linux-64.zip
 
 ADD ./monit_init.sh /usr/bin/monit_init.sh
