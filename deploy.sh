@@ -2,6 +2,8 @@
 
 ipaddr=${1}
 domain=${2:-$ipaddr}
+dynamicport=off
+mkcp=off
 
 if [ -z $ipaddr ];then
     cat <<EOF
@@ -11,7 +13,9 @@ EOF
     exit 1
 fi
 
-port=$RANDOM
+vport_init=$((RANDOM%5000+5000))
+vport_dmin=$((RANDOM%1000+10000))
+vport_dmax=$((RANDOM%1000+12000))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
 ariang_ver=1.1.1
@@ -47,25 +51,31 @@ unzip -q ./AriaNg-$ariang_ver.zip -d $deploydir/http/ariang
 echo "==> edit v2ray config ..."
 uuid1=$(cat /proc/sys/kernel/random/uuid)
 uuid2=$(cat /proc/sys/kernel/random/uuid)
-sed -e "s|{{UUID1}}|${uuid1}|" -e "s|{{UUID2}}|${uuid2}|" \
-    -e "s|{{port1}}|$port|" \
-    -e "s|{{v2raypath}}|$v2raypath|" \
-    -i $deploydir/etc/v2ray-server-config.json
-sed -e "s|{{UUID1}}|${uuid1}|" -e "s|{{UUID2}}|${uuid2}|" \
-    -e "s|{{ip-addr}}|$ipaddr|" -e "s|{{port1}}|$port|" \
+sed -e "s|{{UUID_1}}|${uuid1}|" -e "s|{{UUID_2}}|${uuid2}|" \
+    -e "s|{{ip-addr}}|$ipaddr|" -e "s|{{vport_init}}|$vport_init|" \
+    -e "s|{{vport_dmin}}|$vport_dmin|" -e "s|{{vport_dmax}}|$vport_dmax|" \
     -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
-    -i $deploydir/etc/v2ray-client-config.json
+    -i $deploydir/etc/v2ray-{server,client}-config.json
+if [[ $dynamicport == 'on' ]]; then
+    sed -e 's|//dyp-||' -i $deploydir/etc/v2ray-{server,client}-config.json
+fi
+if [[ $mkcp == 'on' ]]; then
+    sed -e 's|//mkcp-||' -i $deploydir/etc/v2ray-{server,client}-config.json
+fi
 mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 
 echo "==> gen $deploydir/{test.sh,run.sh}"
-cat <<'EOF' | sed "s|{{port1}}|$port|g" > $deploydir/test.sh
+cat > $deploydir/test.sh <<'EOF'
 #!/bin/bash
 #    -v /usr/share/doc/python/html:/usr/share/doc/python3/html \
-docker run --rm --name naive \
-    -p 80:80 -p 443:443 -p {{port1}}:{{port1}} \
-    -v $PWD:/srv:rw \
-    shmilee/naive:${1:-using}
+docker run --rm --name naive {{network-info}} \
+    -v $PWD:/srv:rw shmilee/naive:${1:-using}
 EOF
+if [[ $dynamicport == 'on' || $mkcp == 'on' ]]; then
+    sed -e "s|{{network-info}}|--network=host|" -i $deploydir/test.sh
+else
+    sed -e "s|{{network-info}}|-p 80:80 -p 443:443 -p $vport_init:$vport_init|" -i $deploydir/test.sh
+fi
 sed 's|--rm|--detach --restart=always|'  $deploydir/test.sh > $deploydir/run.sh
 chmod +x $deploydir/{test.sh,run.sh}
 

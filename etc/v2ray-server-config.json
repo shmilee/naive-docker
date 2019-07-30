@@ -6,17 +6,65 @@
   },
   "inbounds": [
     {
-      "port": {{port1}}, // 服务器监听端口
+      "port": {{vport_init}}, // 服务器监听端口
       "protocol": "vmess",    // 主传入协议
       "settings": {
         "clients": [
           {
-            "id": "{{UUID1}}",  // 用户 ID，客户端与服务器必须相同
+            "id": "{{UUID_1}}",  // 用户 ID，客户端与服务器必须相同
             "alterId": 64
           }
-        ]
-      }
+        ]//dyp-,
+        //dyp-"detour": { //绕行配置，即指示客户端使用 dynamicPort 的配置通信
+        //dyp-  "to": "dynamicPort"   
+        //dyp-}
+      }//mkcp-,
+      //mkcp-"streamSettings": {
+      //mkcp-  "network": "mkcp",
+      //mkcp-  "kcpSettings": {
+      //mkcp-    "mtu": 1350,
+      //mkcp-    "tti": 50,
+      //mkcp-    "uplinkCapacity": 6,
+      //mkcp-    "downlinkCapacity": 50,
+      //mkcp-    "congestion": true,
+      //mkcp-    "readBufferSize": 2,
+      //mkcp-    "writeBufferSize": 2,
+      //mkcp-    "header": {
+      //mkcp-      "type": "srtp"
+      //mkcp-    }
+      //mkcp-  }
+      //mkcp-}
     },
+    //dyp-{
+    //dyp-  "protocol": "vmess",
+    //dyp-  "port": "{{vport_dmin}}-{{vport_dmax}}", // 端口范围
+    //dyp-  "tag": "dynamicPort",  // 与上面的 detour to 相同
+    //dyp-  "settings": {
+    //dyp-    "default": {
+    //dyp-      "alterId": 64
+    //dyp-    }
+    //dyp-  },
+    //dyp-  "allocate": {            // 分配模式
+    //dyp-    "strategy": "random",  // 随机开启
+    //dyp-    "concurrency": 2,      // 同时开放几个端口, 少于端口范围的 1/3
+    //dyp-    "refresh": 3           // 每三分钟刷新一次
+    //dyp-  }//mkcp-,
+    //dyp-  //mkcp-"streamSettings": {
+    //dyp-  //mkcp-  "network": "mkcp",
+    //dyp-  //mkcp-  "kcpSettings": {
+    //dyp-  //mkcp-    "mtu": 1350,
+    //dyp-  //mkcp-    "tti": 50,
+    //dyp-  //mkcp-    "uplinkCapacity": 6,
+    //dyp-  //mkcp-    "downlinkCapacity": 50,
+    //dyp-  //mkcp-    "congestion": true,
+    //dyp-  //mkcp-    "readBufferSize": 2,
+    //dyp-  //mkcp-    "writeBufferSize": 2,
+    //dyp-  //mkcp-    "header": {
+    //dyp-  //mkcp-      "type": "srtp"
+    //dyp-  //mkcp-    }
+    //dyp-  //mkcp-  }
+    //dyp-  //mkcp-}
+    //dyp-},    
     {
       "port": 44944,
       "listen": "127.0.0.1",
@@ -24,7 +72,7 @@
       "settings": {
         "clients": [
           {
-            "id": "{{UUID2}}",
+            "id": "{{UUID_2}}",
             "alterId": 64
           }
         ]

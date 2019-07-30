@@ -42,16 +42,31 @@
         "vnext": [
           {
             "address": "{{ip-addr}}",
-            "port": {{port1}},
+            "port": {{vport_init}},
             "users": [
               {
-                "id": "{{UUID1}}",
+                "id": "{{UUID_1}}",
                 "alterId": 64
               }
             ]
           }
         ]
       },
+      //mkcp-"streamSettings": {
+      //mkcp-  "network": "mkcp",
+      //mkcp-  "kcpSettings": {
+      //mkcp-    "mtu": 1350,
+      //mkcp-    "tti": 50,
+      //mkcp-    "uplinkCapacity": 6,
+      //mkcp-    "downlinkCapacity": 50,
+      //mkcp-    "congestion": true,
+      //mkcp-    "readBufferSize": 2,
+      //mkcp-    "writeBufferSize": 2,
+      //mkcp-    "header": {
+      //mkcp-      "type": "srtp"
+      //mkcp-    }
+      //mkcp-  }
+      //mkcp-},
       "mux": {"enabled": true}
     },
     {
@@ -60,11 +75,11 @@
       "settings": {
         "vnext": [
           {
-            "address": "{{domain-name}}",
+            "address": "v2ray.{{domain-name}}",
             "port": 443,
             "users": [
               {
-                "id": "{{UUID2}}",
+                "id": "{{UUID_2}}",
                 "alterId": 64
               }
             ]
