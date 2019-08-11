@@ -57,3 +57,14 @@ ls "$(date +%F)-deploy"
 
 * `turn-on-tcp_bbr.sh`
 * `turn-on-tcp_fastopen.sh`
+
+### optional ipv6 for google
+
+* `HE ipv6 tunnel` script to `/etc/rc.local`
+* `etc-docker-daemon.json`:
+  ```
+  {
+    "ipv6": true,
+    "fixed-cidr-v6": "Tunnel_detail, Routed IPv6 Prefixes, 2001:470:x:y::/64"
+  }  
+  ```
