@@ -8,7 +8,7 @@ mkcp=off
 if [ -z $ipaddr ];then
     cat <<EOF
 usage: $0 ip-addr [domain]
-default domain is ip-addr
+default domain is ip-addr, should use 'only one domain' config
 EOF
     exit 1
 fi
@@ -63,6 +63,12 @@ if [[ $mkcp == 'on' ]]; then
     sed -e 's|//mkcp-||' -i $deploydir/etc/v2ray-{server,client}-config.json
 fi
 mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
+
+# x. only one domain
+sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
+    $deploydir/etc/sites-disabled/nginx-one.vhost
+sed -e "s|v2ray.$domain|$domain|" $deploydir/v2ray-client-config.json \
+    > $deploydir/v2ray-client-one-domain-config.json
 
 echo "==> gen $deploydir/{test.sh,run.sh}"
 cat > $deploydir/test.sh <<'EOF'

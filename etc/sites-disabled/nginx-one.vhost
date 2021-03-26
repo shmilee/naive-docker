@@ -1,0 +1,111 @@
+server {
+    listen       80;
+    server_name  {{domain-name}};
+    # enforce https
+    return 301 https://$server_name$request_uri;
+}
+
+map $http_user_agent $ignore_ua {
+    default  0;
+    "~Go-http-client/.*"  1;
+}
+
+server {
+    listen  443 ssl http2;
+    server_name {{domain-name}};
+
+    ssl_certificate       /srv/etc/ssl-certs/server-one.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-one.key;
+    access_log  /srv/log/nginx-one-access.log main buffer=32k flush=2m;
+    error_log   /srv/log/nginx-one-error.log notice;
+
+    charset   utf-8;
+
+    # ariang
+    location / {
+        root   /srv/http/ariang;
+        index  index.html;
+    }
+
+    location ^~ /aria2-download {
+        auth_basic "Apples and oranges for ariang.";
+        auth_basic_user_file /srv/etc/http-passwd;
+        root  /srv/http;
+        fancyindex on;
+        fancyindex_exact_size off;
+        fancyindex_localtime on;
+        include    /etc/mynginx/mime.types;
+    }
+
+    location /aria2-jsonrpc {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:6800/jsonrpc;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # v2ray websocket
+    location /{{v2raypath}} {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:44944;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+
+        # Show realip in v2ray access.log
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        if ($ignore_ua) {
+            access_log off;
+        }
+    }
+
+    # test lua
+    location /lua_sub {
+        default_type 'text/plain';
+        content_by_lua_block {
+            ngx.say("sub pre: ", ngx.ctx.blah)
+            ngx.ctx.blah = 32
+            ngx.say("sub post: ", ngx.ctx.blah)
+        }
+    }
+
+    location /main {
+        default_type 'text/plain';
+        content_by_lua_block {
+            ngx.ctx.blah = 73
+            ngx.say("main pre: ", ngx.ctx.blah)
+            local res = ngx.location.capture("/lua_sub")
+            ngx.print(res.body)
+            ngx.say("main post: ", ngx.ctx.blah)
+        }
+    }
+
+    #error_page  404              /404.html;
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/mynginx/html;
+    }
+
+    location ~ /\.ht {
+        deny  all;
+    }
+
+    # python3 doc
+    location /py3doc {
+        root   /usr/share/doc/python3/html;
+        index  index.html index.htm;
+    }
+
+    location /status {
+        stub_status on;
+        access_log on;
+    }
+}
