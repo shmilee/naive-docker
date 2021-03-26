@@ -100,7 +100,7 @@ server {
 
     # python3 doc
     location /py3doc {
-        root   /usr/share/doc/python3/html;
+        alias  /usr/share/doc/python3/html;
         index  index.html index.htm;
     }
 
