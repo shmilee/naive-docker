@@ -12,7 +12,7 @@
         "clients": [
           {
             "id": "{{UUID_1}}",  // 用户 ID，客户端与服务器必须相同
-            "alterId": 64
+            "alterId": 0
           }
         ]//dyp-,
         //dyp-"detour": { //绕行配置，即指示客户端使用 dynamicPort 的配置通信
@@ -41,7 +41,7 @@
     //dyp-  "tag": "dynamicPort",  // 与上面的 detour to 相同
     //dyp-  "settings": {
     //dyp-    "default": {
-    //dyp-      "alterId": 64
+    //dyp-      "alterId": 0
     //dyp-    }
     //dyp-  },
     //dyp-  "allocate": {            // 分配模式
@@ -73,7 +73,7 @@
         "clients": [
           {
             "id": "{{UUID_2}}",
-            "alterId": 64
+            "alterId": 0
           }
         ]
       },

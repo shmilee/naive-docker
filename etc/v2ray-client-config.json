@@ -46,7 +46,7 @@
             "users": [
               {
                 "id": "{{UUID_1}}",
-                "alterId": 64
+                "alterId": 0
               }
             ]
           }
@@ -80,7 +80,7 @@
             "users": [
               {
                 "id": "{{UUID_2}}",
-                "alterId": 64
+                "alterId": 0
               }
             ]
           }
