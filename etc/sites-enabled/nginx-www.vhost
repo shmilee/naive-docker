@@ -23,4 +23,15 @@ server {
         stub_status on;
         access_log on;
     }
+
+    # test mryw json
+    location /article/random {
+        default_type application/json;
+        content_by_lua_block {
+            local mryw = require("meiriyiwen")
+            local path = "/srv/etc/mryw/meiriyiwen-all.json"
+            mryw:update_data_results(path)
+            mryw:random_response()
+        }
+    }
 }
