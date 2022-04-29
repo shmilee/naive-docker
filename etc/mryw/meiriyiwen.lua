@@ -59,7 +59,7 @@ function mryw:get_random_result()
     if self.N > 0 then
         local i = math.random(1, self.N)
         if self.dates[i] then
-            return json.encode(self.results[self.dates[i]])
+            return self.results[self.dates[i]]
         end
     end
 end
@@ -67,7 +67,8 @@ end
 -- random response
 function mryw:random_response()
     lngx.header['Content-Type'] = 'application/json; charset=utf-8'
-    lngx.say(self:get_random_result())
+    local data = { data=self:get_random_result() }
+    lngx.say(json.encode(data))
 end
 
 return mryw
