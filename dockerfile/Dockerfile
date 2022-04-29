@@ -3,7 +3,7 @@
 # docker build --force-rm --no-cache --rm -t shmilee/naive:$(date +%y%m%d) .
 #
 
-FROM alpine:3.9
+FROM alpine:3.14
 
 LABEL maintainer="shmilee <shmilee.zju@gmail.com>" version="1.0"
 
@@ -18,11 +18,10 @@ ADD ./monit_init.sh /usr/bin/monit_init.sh
 
 # Add my repository
 COPY ./*@*.rsa.pub /etc/apk/keys/
-RUN echo http://shmilee.io/repo-shmilee/alpine-v3.9/shmilee > /etc/apk/repositories
+RUN echo http://shmilee.io/repo-shmilee/alpine-v3.14/shmilee > /etc/apk/repositories
 
-RUN echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.9/main >> /etc/apk/repositories \
- && echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.9/community >> /etc/apk/repositories \
- && addgroup -g 82 -S www-data \
+RUN echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.14/main >> /etc/apk/repositories \
+ && echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.14/community >> /etc/apk/repositories \
  && adduser -u 82 -D -S -h /srv/http -G www-data -g www-data www-data \
  && echo "==> tini monit mynginx aria2 cjson redis..." \
  && apk --no-cache add coreutils bash nano tzdata ca-certificates openssl \
