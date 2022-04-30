@@ -5,7 +5,7 @@ local math = { randomseed=math.randomseed, random=math.random }
 local os = { time=os.time }
 local io = { open=io.open }
 local tostring = tostring
-
+local string = { gsub=string.gsub }
 local jsonloaded, json = pcall(require, "cjson")
 if not jsonloaded then
     json = require("dkjson")
@@ -16,6 +16,7 @@ if ngx == nil then
 else
     lngx = { header=ngx.header, say=ngx.say }
 end
+local templateloaded, template = pcall(require, "resty_template")
 
 local mryw = { path=nil, N=0, dates=nil, results=nil}
 
@@ -64,11 +65,48 @@ function mryw:get_random_result()
     end
 end
 
--- random response
-function mryw:random_response()
+-- random json response
+function mryw:random_json_response()
     lngx.header['Content-Type'] = 'application/json; charset=utf-8'
     local data = { data=self:get_random_result() }
     lngx.say(json.encode(data))
+end
+
+-- random html response
+mryw.HTML_template = [[
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="referrer" content="no-referrer" />
+<style type="text/css">
+body{background-image:url(https://wx2.sinaimg.cn/mw2000/785894d3ly1gzt7zjs6q5j20u014ngvw.jpg);background-size:100%;}#article_show{background-color:rgba(255,255,255,0.98);border-radius:50px;margin:50px auto;min-height:300px;padding:60px 50px;position:relative;width:62%;max-width:700px;z-index:0}#article_show h1{color:#000;font-weight:normal;letter-spacing:4px;position:relative;text-align:center;text-transform:uppercase}#article_show p{color:#000;font-size:16px;font-weight:normal;line-height:36px;margin-bottom:30px;text-align:justify}#article_author{color:#999!important;text-align:center!important}
+</style>
+<title>{*title*} {*author*} | 每日一文</title>
+</head>
+<body>   
+<div id="article_show">
+    <h1>{*title*}</h1>
+    <p id="article_author"><span>{*author*}</span></p>
+    <div class="article_text">
+    {*content*}
+    </div>
+</div>
+</body>
+</html>
+]]
+
+function mryw:random_html_response()
+    lngx.header['Content-Type'] = 'text/html; charset=utf-8'
+    local data = self:get_random_result()
+    if templateloaded then
+        template.render(self.HTML_template, data)
+    else
+        local html = string.gsub(self.HTML_template, "{%*title%*}", data.title)
+        html = string.gsub(html, "{%*author%*}", data.author)
+        html = string.gsub(html, "{%*content%*}", data.content)
+        lngx.say(html)
+    end
 end
 
 return mryw

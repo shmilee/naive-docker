@@ -24,14 +24,24 @@ server {
         access_log on;
     }
 
-    # test mryw json
+    # test mryw
     location /article/random {
         default_type application/json;
         content_by_lua_block {
             local mryw = require("meiriyiwen")
-            local path = "/srv/etc/mryw/meiriyiwen-all.json"
+            local path = "/srv/etc/lualib/meiriyiwen-all.json"
             mryw:update_data_results(path)
-            mryw:random_response()
+            mryw:random_json_response()
+        }
+    }
+
+    location /random {
+        default_type text/html;
+        content_by_lua_block {
+            local mryw = require("meiriyiwen")
+            local path = "/srv/etc/lualib/meiriyiwen-all.json"
+            mryw:update_data_results(path)
+            mryw:random_html_response()
         }
     }
 }
