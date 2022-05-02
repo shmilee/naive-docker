@@ -34,7 +34,7 @@ body{background-image:url(https://wx2.sinaimg.cn/mw2000/785894d3ly1gzt7zjs6q5j20
             title:"ERROR", author:"", content:"No data!", date:{curr:""}
         } });
     };
-    xhr.open("GET", "/api/article", true);
+    xhr.open("GET", "/api/article"+"?t="+new Date().getTime(), true);
     xhr.send();
 </script>
 </body>
