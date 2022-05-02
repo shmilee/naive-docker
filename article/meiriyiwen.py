@@ -41,7 +41,7 @@ def dates(start, stop):
 
 def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
     '''
-    Get all data, save them to output.
+    Get all data, save them to output json file.
     '''
     old_results = {}
     if os.path.exists(output):
@@ -75,5 +75,33 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
             json.dump(results, out, ensure_ascii=False)
 
 
+def split_json(file, outdir='./mryw-split-jsons'):
+    '''Read results in file, save them to outdir/date-names.'''
+    if os.path.exists(file):
+        with open(file, 'r', encoding='utf8') as f:
+            results = json.load(f)
+        L = len(results)
+        print("[Info] Read %d results from '%s'." % (L, file))
+        if not os.path.exists(outdir):
+            os.mkdir(outdir)
+        all_dates = []
+        for day in results:
+            if results[day] == 40404:
+                continue
+            all_dates.append(day)
+            output = '%s/%s.json' % (outdir, day)
+            if os.path.isfile(output):
+                print("[Info] %s exists." % output)
+                continue
+            with open(output, 'w', encoding='utf8') as out:
+                #print("[Info] Writting %s ..." % output)
+                json.dump(dict(data=results[day]), out, ensure_ascii=False)
+        with open('%s/dates.json' % outdir, 'w', encoding='utf8') as out:
+            print("[Info] Writting (%d/%d) dates ..." % (len(all_dates), L))
+            json.dump(sorted(all_dates), out, ensure_ascii=False)
+
+
 if __name__ == '__main__':
-    main('./meiriyiwen-all.json', dt=2)
+    output = './meiriyiwen-all.json'
+    main(output, dt=2)
+    split_json(output)

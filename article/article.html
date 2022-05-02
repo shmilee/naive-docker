@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="referrer" content="no-referrer" />
+<style type="text/css">
+body{background-image:url(https://wx2.sinaimg.cn/mw2000/785894d3ly1gzt7zjs6q5j20u014ngvw.jpg);background-size:100%;}#article_show{background-color:rgba(255,255,255,0.98);border-radius:50px;margin:50px auto;min-height:300px;padding:60px 50px;position:relative;width:62%;max-width:700px;z-index:0}#article_show h1{color:#000;font-weight:normal;letter-spacing:4px;position:relative;text-align:center;text-transform:uppercase}#article_show p{color:#000;font-size:16px;font-weight:normal;line-height:36px;margin-bottom:30px;text-align:justify}#article_author{color:#999!important;text-align:center!important}#article_date{text-align:right!important;font-size:12px!important}
+</style>
+<script src="https://cdn.bootcss.com/vue/2.6.14/vue.min.js"></script>
+<title>每日一文</title>
+</head>
+<body>   
+<div id="article_show">
+    <h1>{{title}}</h1>
+    <p id="article_author"><span>{{author}}</span></p>
+    <div class="article_text" v-html='content'></div>
+    <p id="article_date"><i>(Date: {{date.curr}})</i></p>
+</div>
+<script>
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        try {
+            const myobj = JSON.parse(this.responseText);
+            new Vue({ el: '#article_show', data: myobj.data });
+            document.title = `${myobj.data.title} ${myobj.data.author} | 每日一文`;
+        } catch (e) {
+            new Vue({ el: '#article_show', data: {
+                title:"ERROR", author:"", content:"Wrong data!", date:{curr:""}
+            } });
+        };
+    };
+    xhr.onerror = function () {
+        new Vue({ el: '#article_show', data: {
+            title:"ERROR", author:"", content:"No data!", date:{curr:""}
+        } });
+    };
+    xhr.open("GET", "/api/article", true);
+    xhr.send();
+</script>
+</body>
+</html>

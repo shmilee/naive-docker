@@ -64,6 +64,14 @@ if [[ $mkcp == 'on' ]]; then
 fi
 mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 
+#4. article
+echo "==> add article files ..."
+cp -r article $deploydir/http/
+old_PATH="$(pwd)"
+cd $deploydir/http/article/
+python3 ./meiriyiwen.py
+cd "${old_PATH}"
+
 # x. only one domain
 sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
     $deploydir/etc/sites-disabled/nginx-one.vhost
