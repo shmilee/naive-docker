@@ -68,7 +68,7 @@ mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 echo "==> add article files ..."
 cp -r article $deploydir/http/
 old_PATH="$(pwd)"
-cd $deploydir/http/article/
+cd $deploydir/http/article/mryw/
 python3 ./meiriyiwen.py
 cd "${old_PATH}"
 

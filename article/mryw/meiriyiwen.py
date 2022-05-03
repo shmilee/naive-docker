@@ -75,7 +75,7 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
             json.dump(results, out, ensure_ascii=False)
 
 
-def split_json(file, outdir='./mryw-split-jsons'):
+def split_json(file, outdir='./split-jsons'):
     '''Read results in file, save them to outdir/date-names.'''
     if os.path.exists(file):
         with open(file, 'r', encoding='utf8') as f:

@@ -24,21 +24,5 @@ server {
         access_log on;
     }
 
-    # test mryw
-    location /article {
-        default_type text/html;
-        alias /srv/http/article/article.html;
-    }
-    location /api/article {
-        content_by_lua_block {
-            local mryw = require("meiriyiwen")
-            local path = "/srv/http/article/mryw-split-jsons/dates.json"
-            mryw:update_dates_info(path)
-            mryw:random_json_response('/article/mryw-split-jsons')
-        }
-    }
-    location /article/mryw-split-jsons/ {
-        default_type application/json;
-        alias /srv/http/article/mryw-split-jsons/;
-    }
+    include  /srv/http/article/location-*.conf;
 }
