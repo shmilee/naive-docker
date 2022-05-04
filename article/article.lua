@@ -30,7 +30,7 @@ end
 local function read_file(path)
     local f = io.open(path, "r")
     if f then
-        print('Reading', path)
+        --print('Reading ', path)
         local data = f:read("*all")
         f:close()
         return data
