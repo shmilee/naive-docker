@@ -87,11 +87,20 @@ local function get_random_key(keys, N)
 end
 
 -- get json response, json file in location *loc*
+-- ?key=xxx&nck
 -- if no *args.key*, return random one
+-- *args.nck*, do not check the input *args.key*, default false
 function article:get_json_response(loc, args)
     local key = args and args.key
+    local nck = args and args.nck
     if self.keys then
-        if not (key and table_index(self.keys, key)) then
+        if key and not nck then
+            --print('CHECK key: ', key)
+            if not table_index(self.keys, key) then
+                key = nil
+            end
+        end
+        if not key then
             key = get_random_key(self.keys, self.N)
         end
         if key then
@@ -102,6 +111,7 @@ function article:get_json_response(loc, args)
 end
 
 -- get html response, html template in *hpath*
+-- ?key=xxx
 -- if no *args.key*, return random one
 function article:get_html_response(hpath, args)
     local key = args and args.key
