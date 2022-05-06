@@ -3,9 +3,8 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta name="referrer" content="no-referrer" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style type="text/css">
-body{background-image:url(https://wx2.sinaimg.cn/mw2000/785894d3ly1gzt7zjs6q5j20u014ngvw.jpg);background-size:100%}#article_show{background-color:rgba(255,255,255,0.98);border-radius:30px;margin:30px auto;min-height:300px;position:relative;width:72%;max-width:800px;z-index:0}#article_show p,a,figure{color:#000;font-size:16px;font-weight:normal;line-height:36px;margin:20px 50px;text-align:justify}#article_content figure,.video-box{text-align:center;display:block}#article_content figure figcaption{margin:0 50px}#article_date{text-align:right!important;font-size:12px!important}
+body{background-image:url(https://wx2.sinaimg.cn/mw2000/785894d3ly1gzt7zjs6q5j20u014ngvw.jpg);background-size:100%}#article_show{background-color:rgba(255,255,255,0.98);border-radius:30px;margin:30px auto;min-height:300px;position:relative;width:72%;max-width:800px;z-index:0}#article_show p,a,figure{color:#000;font-size:16px;font-weight:normal;line-height:36px;margin:20px 50px;text-align:justify}#article_content figure,a.video-box,span.content{text-align:center;display:block}#article_content figure figcaption{margin:0 50px}#article_date{text-align:right!important;font-size:12px!important}
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>每天60秒读懂世界</title>
@@ -13,13 +12,7 @@ body{background-image:url(https://wx2.sinaimg.cn/mw2000/785894d3ly1gzt7zjs6q5j20
 <body>   
 <div id="article_show">
     <div id="article_content"></div>
-    <p id="article_date"><i>
-        <script>
-            today=new Date();
-            document.write(
-                "(Today: ",today.getFullYear(),"年",today.getMonth()+1,"月",today.getDate(),"日)");
-        </script>
-    </i></p>
+    <p id="article_date"></p>
 </div>
 <script>
 function getnews(limit, offset){
@@ -35,17 +28,16 @@ $.ajax({
         $('p[data-pid="A_qhGZdV"]').remove();
         $('p[data-pid="76dBAccz"]').replaceWith('<hr style="margin:0 50px 30px">');
         $("#article_content p:first").css({"text-align": "center", "margin": "0"});
+        $("span").remove(".url");
         $("img").each(function (i) {
-                if (i==0) {
-                    // figure 0
+                if (i==0) { // figure 0
                     $(this).attr("width", "100%");
                     $(this).css("border-radius", "30px 30px 20px 20px");
                 } else {
                     $(this).attr("width", "90%");
                 };
         });
-        // figure 0
-        $("figure:first").css("margin", "0");
+        $("figure:first").css("margin", "0"); // figure 0
     },
     error: function(e){
         alert("获取失败");
@@ -54,6 +46,14 @@ $.ajax({
 }
 $(document).ready(function(){
     getnews(1, 0);
+    const today=new Date();
+    $("#article_date").html(`<i>(Today: ${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日)</i>`);
+    const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+    );
+    if (flag || (window.innerWidth < 800)) {
+        $("#article_show").css("width", "90%"); // alert(`flag${flag}, 窗口${window.innerWidth}`);
+    };
 });
 </script>
 </body>
