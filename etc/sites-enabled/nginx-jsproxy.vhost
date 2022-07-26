@@ -1,0 +1,221 @@
+## jsproxy nginx confs: from dir /srv/etc/jsproxy/jsproxy-0.1.0 ##
+
+log_format  log_proxy escape=none
+    '02	'
+    '$time_iso8601	'
+    '$_origin_id	'
+    '$_ver	'
+    '$remote_addr	'
+    '$_level	'
+    '$_switched	'
+    '$upstream_cache_status	'
+    '$request_time	'
+    '$request_length	'
+    '$bytes_sent	'
+    '$request_method	'
+    '$_url	'
+    '$status	'
+    '$_bodyhash	'
+    '$upstream_http_access_control_allow_origin	'
+    '$http_user_agent	'
+    '$_ref	'
+    '$_mode	'
+    '$_type';
+
+log_format  log_www escape=none
+    '01	'
+    '$time_iso8601	'
+    '$remote_addr	'
+    '$request_time	'
+    '$request_method	'
+    '$uri	'
+    '$http_host	'
+    '$status	'
+    '$http_user_agent';
+
+# https://nginx.org/en/docs/http/ngx_http_limit_req_module.html
+limit_req_zone  $binary_remote_addr zone=reqip:16m rate=100r/s;
+
+# https://nginx.org/cn/docs/http/ngx_http_proxy_module.html
+# 1MB = 8000key
+proxy_cache_path  cache
+    levels=1:2
+    keys_zone=my_cache:32m
+    max_size=2g
+    inactive=6h
+    use_temp_path=off;
+
+map $http_origin $_origin_id {
+    # allowed-sites
+    # 授权哪些站点可使用本服务，防止外链
+    # 本服务会校验 HTTP 请求头 origin 字段，如果不在该列表，则拒绝代理
+    # 每个 URL 对应一个短别名，用于日志记录
+    # 注意 URL 不包含路径部分（结尾没有 /）
+    #
+    http://127.0.0.1         '127';
+    http://127.0.0.1:8080    '127';
+    http://localhost         'lo';
+    http://localhost:8080    'lo';
+    
+    # 接口和网站同源，这种情况下 origin 为空
+    ''                       'mysite';
+    
+    # ~ 开头为正则匹配，此处允许 github.io 所有子站点
+    ~^https://([\w-]+)\.github\.io$   'gh-$1';
+    
+    # 允许任何站点使用
+    # ~(.*)                  '$1';
+}
+
+server {
+    listen       80;
+    server_name  jsproxy.{{domain-name}};
+    # enforce https
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen                443 ssl http2;
+    server_name           jsproxy.{{domain-name}};
+
+    ssl_certificate       /srv/etc/ssl-certs/server-jsproxy.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-jsproxy.key;
+    access_log            /srv/log/nginx-jsproxy.log log_proxy buffer=64k flush=1s;
+    error_log             /srv/log/nginx-jsproxy-error.log notice;
+
+    # https://nginx.org/en/docs/http/ngx_http_core_module.html
+    resolver              8.8.8.8 ipv6=off;
+    resolver_timeout      10s;
+
+    # https://nginx.org/en/docs/http/ngx_http_limit_req_module.html
+    limit_req_log_level   warn;
+    limit_req             zone=reqip burst=200 nodelay;
+
+    # https://nginx.org/cn/docs/http/ngx_http_proxy_module.html
+    proxy_http_version    1.1;
+    proxy_ssl_server_name on;
+    proxy_buffer_size     16k;
+    proxy_buffers         4 32k;
+    proxy_busy_buffers_size 64k;
+    proxy_send_timeout    30s;
+    proxy_read_timeout    30s;
+    proxy_connect_timeout 10s;
+
+    ### start include api.conf; ###
+    set                   $_level     '';
+    set                   $_switched  '';
+    set                   $_url       '';
+    set                   $_ver       '';
+    set                   $_ref       '';
+    set                   $_type      '';
+    set                   $_mode      '';
+    set                   $_bodyhash  '';
+
+    error_page            500 502 504 /error;
+    location = /error {
+      internal;
+      access_log          off;
+      more_set_headers
+        'access-control-allow-origin: *'
+        'access-control-expose-headers: gateway-err--'
+        'gateway-err--: {"msg": "$arg_msg", "addr": "$upstream_addr", "url": "$arg_url"}';
+      return              204;
+    }
+
+    location = /preflight {
+      internal;
+      access_log          off;
+      more_set_headers
+        'access-control-allow-origin: *'
+        'access-control-allow-methods: GET,POST,PUT,PATCH,TRACE,DELETE,HEAD,OPTIONS'
+        'access-control-max-age: 1728000'
+      ;
+      return              204;
+    }
+
+    # 该接口已作废
+    location = /http {
+      access_log          off;
+      more_set_headers    'access-control-allow-origin: *';
+      return              200  "该接口已作废，请更新前端脚本";
+    }
+
+    # HTTP(S) Proxy
+    location /http/ {
+      # see #allowed-sites
+      if ($_origin_id = '') {
+        rewrite             ^   /error?msg=ORIGIN_NOT_ALLOWED;
+      }
+      if ($http_x_jsproxy) {
+        rewrite             ^   /error?msg=CIRCULAR_DEPENDENCY;
+      }
+      proxy_set_header      x-jsproxy   1;
+      proxy_set_header      Connection  $http_connection;
+
+      if ($http_access_control_request_methods) {
+        rewrite             ^   /preflight;
+      }
+
+      access_by_lua_file    /srv/etc/jsproxy/jsproxy-0.1.0/lua/http-dec-req-hdr.lua;
+
+      proxy_cache           my_cache;
+      proxy_pass            $_url;
+
+      more_set_headers
+        'server: $upstream_http_server'
+        'content-security-policy'
+        'content-security-policy-report-only'
+        'x-frame-options'
+        'alt-svc'
+        'clear-site-data';
+      header_filter_by_lua_file   /srv/etc/jsproxy/jsproxy-0.1.0/lua/http-enc-res-hdr.lua;
+      body_filter_by_lua_file     /srv/etc/jsproxy/jsproxy-0.1.0/lua/http-body-hash.lua;
+    }
+
+    # WebSocket Proxy
+    location = /ws {
+      access_by_lua_file    /srv/etc/jsproxy/jsproxy-0.1.0/lua/ws-dec-req-hdr.lua;
+      proxy_set_header      Upgrade     $http_upgrade;
+      proxy_set_header      Connection  $http_connection;
+      proxy_pass            $_url;
+    }
+    ### end include api.conf; ###
+
+    ### start include www.conf; ###
+    charset               utf-8;
+    log_not_found         off;
+
+    error_page            404 = /404.html;
+    location = /404.html {
+        internal;
+        root                /srv/etc/jsproxy/jsproxy-0.1.0/www;
+
+        # http 重定向到 https（忽略 localhost 或 IP 访问）
+        access_by_lua_block {
+          if ngx.var.scheme == 'https' then
+            return
+          end
+          local host = ngx.var.host
+          if host == 'localhost' then
+            return
+          end
+          if ngx.re.match(host, [[^\d+\.\d+\.\d+\.\d+$]]) then
+            return
+          end
+          local url = host .. ':8443' .. ngx.var.request_uri
+          ngx.redirect('https://' .. url, 301)
+        }
+
+        # 永久重定向申请: https://hstspreload.org/
+        more_set_headers
+          'strict-transport-security: max-age=99999999; includeSubDomains; preload';
+    }
+
+    location / {
+        access_log          /srv/log/nginx-jsproxy-access.log log_www buffer=64k flush=1s;
+        root                /srv/etc/jsproxy/jsproxy-0.1.0/www;
+        index               404.html;
+    }
+
+    ### end include www.conf; ###
+}

@@ -72,6 +72,12 @@ cd $deploydir/http/article/mryw/
 python3 ./meiriyiwen.py
 cd "${old_PATH}"
 
+#5. jsproxy
+echo "==> download jsproxy files ..."
+cd $deploydir/etc/jsproxy
+./download.sh
+cd "${old_PATH}"
+
 # x. only one domain
 sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
     $deploydir/etc/sites-disabled/nginx-one.vhost
