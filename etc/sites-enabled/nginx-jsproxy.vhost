@@ -182,7 +182,7 @@ server {
     ### end include api.conf; ###
 
     ### start include www.conf; ###
-    charset               utf-8;
+    #charset               utf-8,gbk;
     log_not_found         off;
 
     error_page            404 = /404.html;
@@ -212,6 +212,8 @@ server {
     }
 
     location / {
+        auth_basic "Apples and oranges for jsproxy.";
+        auth_basic_user_file /srv/etc/http-passwd;
         access_log          /srv/log/nginx-jsproxy-access.log log_www buffer=64k flush=1s;
         root                /srv/etc/jsproxy/jsproxy-0.1.0/www;
         index               404.html;
