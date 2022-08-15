@@ -11,6 +11,9 @@ rm -f jsproxy.tar.gz
 curl -o www.tar.gz $ZIP_URL/gh-pages
 tar zxf www.tar.gz -C jsproxy-$JSPROXY_VER/www --strip-components=1
 rm -f www.tar.gz
+# add scholar
+cp scholar.png jsproxy-$JSPROXY_VER/www/assets/ico/
+patch -b -p1 -d jsproxy-$JSPROXY_VER/www -i ../../www-index_v3.patch
 
 # resty/?.lua
 wget -c -O lua-resty-string.tar.gz https://github.com/openresty/lua-resty-string/archive/refs/tags/v0.15.tar.gz
