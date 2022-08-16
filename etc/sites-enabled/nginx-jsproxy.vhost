@@ -213,7 +213,7 @@ server {
 
     location / {
         auth_basic "Apples and oranges for jsproxy.";
-        auth_basic_user_file /srv/etc/http-passwd;
+        auth_basic_user_file /srv/etc/http-passwd-jsproxy;
         access_log          /srv/log/nginx-jsproxy-access.log log_www buffer=64k flush=1s;
         root                /srv/etc/jsproxy/jsproxy-0.1.0/www;
         index               404.html;

@@ -18,7 +18,8 @@ vport_dmin=$((RANDOM%1000+10000))
 vport_dmax=$((RANDOM%1000+12000))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
-ariang_ver=1.1.1
+ariang_ver=1.2.4
+JSPROXY_VER=0.1.0
 
 if [ -d $deploydir ];then
     echo "Do yourself! sudo rm -rf $deploydir/"
@@ -75,8 +76,17 @@ cd "${old_PATH}"
 #5. jsproxy
 echo "==> download jsproxy files ..."
 cd $deploydir/etc/jsproxy
-./download.sh
+./download.sh $JSPROXY_VER
 cd "${old_PATH}"
+jwho=$(cat /proc/sys/kernel/random/uuid | cut -d- -f4)
+jkey=$(cat /proc/sys/kernel/random/uuid | cut -d- -f5)
+printf "$jwho:$(openssl passwd -crypt $jkey)\n" > $deploydir/etc/http-passwd-jsproxy
+pass64=$(echo -n "$jwho:$jkey" | base64) # js btoa("$jwho:$jkey")
+sed -e "s|ASSET_URL = '.*etherdream.github.io.*'|ASSET_URL = 'https://jsproxy.$domain'|" \
+    -e "s|fetch(ASSET_URL + path)|fetch(ASSET_URL + path, {headers:{'Authorization': 'Basic $pass64'}})|" \
+    $deploydir/etc/jsproxy/jsproxy-$JSPROXY_VER/cf-worker/index.js \
+    > $deploydir/jsproxy-cf-worker-index.js
+echo -e "url: https://jsproxy.$domain\nuser: $jwho\npasswd: $jkey\ncf-worker-js: jsproxy-cf-worker-index.js" > $deploydir/jsproxy-info
 
 # x. only one domain
 sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
@@ -87,7 +97,7 @@ sed -e "s|v2ray.$domain|$domain|" $deploydir/v2ray-client-config.json \
 echo "==> gen $deploydir/{test.sh,run.sh}"
 cat > $deploydir/test.sh <<'EOF'
 #!/bin/bash
-#    -v /usr/share/doc/python/html:/usr/share/doc/python3/html \
+#    -v /usr/share/doc/python3/html:/usr/share/doc/python3/html \
 docker run --rm --name naive {{network-info}} \
     -v $PWD:/srv:rw shmilee/naive:${1:-using}
 EOF
@@ -114,4 +124,5 @@ If containers run scucessfully, then
 Some important information!
     $deploydir/aria2-user-info
     $deploydir/v2ray-client-config.json
+    $deploydir/jsproxy-info
 EOF

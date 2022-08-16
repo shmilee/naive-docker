@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (C) 2022 shmilee
 
-JSPROXY_VER=0.1.0
+JSPROXY_VER="$1"
 ZIP_URL=https://codeload.github.com/EtherDream/jsproxy/tar.gz
 
 curl -o jsproxy.tar.gz $ZIP_URL/$JSPROXY_VER
