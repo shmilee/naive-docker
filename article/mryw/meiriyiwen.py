@@ -9,6 +9,13 @@ import datetime
 import requests
 import contextlib
 import json
+import difflib
+
+try:
+    import opencc
+    CCer = opencc.OpenCC('t2s.json')
+except:
+    CCer = None
 
 URL = 'https://interface.meiriyiwen.com/article/day?dev=1&date='
 
@@ -51,8 +58,9 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
         except Exception:
             pass
         old_L = len(old_results)
-        print("[Info] Read %d results from '%s'." % (old_L, output))
+        print("[Info] Get %d downloaded results from '%s'." % (old_L, output))
     results = {}
+    results_404 = []
     for day in dates(start, stop):
         try:
             if day not in old_results:
@@ -61,12 +69,18 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
                     print("[Info] Get data of day: %s" % day)
                     results[day] = data
                     time.sleep(dt)
-            elif type(old_results[day]) != dict:
-                print(day, ':', old_results[day])
+            else:
+                data = old_results[day]
+            if data == 40404:
+                results_404.append(day)
+            elif type(data) != dict:
+                print(day, ':', data)  # never
         except KeyboardInterrupt:
             ask = input("\n[Interrupt] Stop downloading?")
             if ask in ('y', 'Y'):
                 break
+    if results_404:
+        print('[404 data days(%d)]: ' % len(results_404), results_404)
     if results:
         results.update(old_results)
         with open(output, 'w', encoding='utf8') as out:
@@ -76,29 +90,101 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
 
 
 def split_json(file, outdir='./split-jsons'):
-    '''Read results in file, save them to outdir/date-names.'''
-    if os.path.exists(file):
-        with open(file, 'r', encoding='utf8') as f:
-            results = json.load(f)
-        L = len(results)
-        print("[Info] Read %d results from '%s'." % (L, file))
-        if not os.path.exists(outdir):
-            os.mkdir(outdir)
-        all_dates = []
-        for day in results:
-            if results[day] == 40404:
-                continue
-            all_dates.append(day)
-            output = '%s/%s.json' % (outdir, day)
-            if os.path.isfile(output):
-                print("[Info] %s exists." % output)
-                continue
-            with open(output, 'w', encoding='utf8') as out:
-                #print("[Info] Writting %s ..." % output)
-                json.dump(dict(data=results[day]), out, ensure_ascii=False)
-        with open('%s/dates.json' % outdir, 'w', encoding='utf8') as out:
-            print("[Info] Writting (%d/%d) dates ..." % (len(all_dates), L))
-            json.dump(sorted(all_dates), out, ensure_ascii=False)
+    '''Read results in source file, save them to outdir/{date,title}-names.'''
+    if not os.path.exists(file):
+        print("[Error] %s not found!" % file)
+        return
+
+    with open(file, 'r', encoding='utf8') as f:
+        results = json.load(f)
+    L = len(results)
+    print("[Info] Read %d results from '%s'." % (L, file))
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    N = 0
+    alias = {}  # title-author
+    for day in results:
+        if results[day] == 40404:
+            continue
+        N += 1
+        title = '{title}-{author}'.format(**results[day])
+        digest = results[day]['digest'].replace(' ', '')
+        # __dl.append(len(digest)) # sorted, 59, 60, .., 69, 70, 70, ...
+        if CCer:
+            digest = CCer.convert(digest)
+        if title not in alias:
+            alias[title] = {digest: [day]}
+        else:
+            if digest not in alias[title]:
+                added = False
+                for dig in alias[title].keys():
+                    sr = difflib.SequenceMatcher(None, dig, digest).ratio()
+                    # 0.571 0.714 0.857 0.885 , >0.9
+                    if sr > 0.9:
+                        #print('%s %s' % (sr, title))
+                        #print(alias[title][dig], dig)
+                        #print([day], digest, '\n')
+                        alias[title][dig].append(day)  # similar-add
+                        added = True
+                        break
+                if not added:
+                    alias[title][digest] = [day]  # new-add
+            else:
+                alias[title][digest].append(day)  # equal-add
+    M = len(alias)
+    print("[Info] Get (%d/%d)dates, (%d/%d)titles." % (N, L, M, N))
+
+    # DO alias[title] = {digest1: [days-1], digest2: [days-2], ...}
+    u_dates, l_dates, l_titles = [], [], []
+
+    def _write_data(day, daylinks, titlelinks):
+        output = '%s/%s.json' % (outdir, day)
+        if os.path.isfile(output):
+            print("[Info] %s exists." % output)
+            return
+        with open(output, 'w', encoding='utf8') as out:
+            #print("[Info] Writting %s ..." % output)
+            json.dump(dict(data=results[day]), out, ensure_ascii=False)
+        u_dates.append(day)
+        l_dates.extend(daylinks)
+        l_titles.extend(titlelinks)
+        for ln in daylinks + titlelinks:
+            link = '%s/%s.json' % (outdir, ln)
+            if os.path.isfile(link):
+                print("[Info] %s exists." % link)
+            else:
+                src = os.path.basename(output)  # same dir with *link*
+                #print("[Info] Linking %s -> %s ..." % (link, src))
+                os.symlink(src, link)
+
+    for title, ds in alias.items():
+        # sort -> [[days-1], ...]
+        dsl = []
+        for dig, days in ds.items():
+            days.sort()
+            dsl.append(days)
+        dsl.sort()
+        if len(dsl) > 1:
+            # title(title-1), title-2, ...
+            # [days-1],       [days-2], ...
+            i = 0
+            for days in dsl:
+                i += 1
+                tlinks = ['%s-%d' % (title, i)]
+                if i == 1:
+                    tlinks.append(title)
+                _write_data(days[0], days[1:], tlinks)
+        else:
+            # title, [days]
+            days = dsl[0]
+            _write_data(days[0], days[1:], [title])
+
+    keys = u_dates + l_dates + l_titles
+    with open('%s/keys.json' % outdir, 'w', encoding='utf8') as out:
+        print("[Info] Writting (%d/%d) dates ..." % (len(u_dates), L))
+        print("[Info] Writting (%d/%d) link-dates ..." % (len(l_dates), L))
+        print("[Info] Writting (%d/%d) link-titles ..." % (len(l_titles), L))
+        json.dump(sorted(keys), out, ensure_ascii=False)
 
 
 if __name__ == '__main__':
