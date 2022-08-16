@@ -80,7 +80,8 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
             if ask in ('y', 'Y'):
                 break
     if results_404:
-        print('[404 data days(%d)]: ' % len(results_404), results_404)
+        print('[Info] %d empty(40404) days.' % len(results_404))
+        #print('\t', results_404)
     if results:
         results.update(old_results)
         with open(output, 'w', encoding='utf8') as out:
