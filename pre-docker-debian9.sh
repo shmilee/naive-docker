@@ -13,4 +13,5 @@ echo "==> pull shmilee/naive"
 docker pull shmilee/naive:${1:-190728}
 docker tag shmilee/naive:${1:-190728} shmilee/naive:using
 echo "==> add other pkgs"
-apt-get install unzip tig htop zsh vim python3-doc
+apt-get install unzip tig htop zsh vim python3-doc python3-pip
+pip3 install --user pypinyin opencc
