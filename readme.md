@@ -42,16 +42,23 @@ bash ./pre-docker-debian9.sh
 ```
 bash ./deploy.sh ip-addr [domain]
 ls "$(date +%F)-deploy"
+# copy some old deploy-files to new deploy-dir/ if needed
+bash ./deploy-post-cp2new.sh [src] [dst]
 ```
 
-* Note: [SSL certificates, Cloudflare SSL options](https://support.cloudflare.com/hc/en-us/articles/200170416-End-to-end-HTTPS-with-Cloudflare-Part-3-SSL-options)
+* Note: [SSL certificates, Cloudflare SSL options](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes)
   - no certificate, Off & Flexible **not recommended**
   - self-signed, Full
   - valid & trusted by Cloudflare, Full (strict)
 
+* Note: [Cloudflare worker routes for jsproxy](https://developers.cloudflare.com/workers/platform/routing/routes)
+  - DNS record, `xxxx`
+  - add route, `xxxx.yyy.zz/*`
+
 * download
   - aria2 token, user, passwd `20XX-XX-XX-deploydir/aria2-user-info`
   - v2ray client config `20XX-XX-XX-deploy/v2ray-client-config.json`
+  - jsproxy url, user, passwd `20XX-XX-XX-deploy/jsproxy-info`
 
 ### optional optimization
 
