@@ -4,7 +4,7 @@ V2RAY_LOCATION_ASSET=${V2RAY_LOCATION_ASSET:-/etc/v2ray}
 V2RAY_ZIP_URL='https://github.com/v2fly/v2ray-core/releases/download/v%s/v2ray-linux-64.zip'
 
 # update v2ray
-V2RAY_NEW_VERSION=4.45.2
+V2RAY_NEW_VERSION=5.1.0
 
 V2RAY_CACHE_ZIP=/srv/v2ray-linux-64-v${V2RAY_NEW_VERSION}.zip
 

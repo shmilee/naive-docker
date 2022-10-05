@@ -47,7 +47,7 @@ check process aria2c matching "aria2c.*daemon"
     group webserver
 
 check process v2ray matching "v2ray.*/srv/etc/v2ray-server-config.json"
-    start program = "/bin/bash -c 'nohup v2ray -config /srv/etc/v2ray-server-config.json >/dev/null &'"
+    start program = "/bin/bash -c 'nohup v2ray run -config /srv/etc/v2ray-server-config.json >/dev/null &'"
         as uid nobody and gid nobody
     stop program = "/usr/bin/killall v2ray"
         as uid nobody and gid nobody
