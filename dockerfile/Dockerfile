@@ -11,7 +11,7 @@ ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     TIMEZONE=Asia/Shanghai \
     TERM=xterm-color \
     V2RAY_LOCATION_ASSET=/etc/v2ray \
-    V2RAY_VERSION=4.43.0 \
+    V2RAY_VERSION=5.1.0 \
     V2RAY_ZIP_URL=https://github.com/v2fly/v2ray-core/releases/download/v%s/v2ray-linux-64.zip
 
 ADD ./monit_init.sh /usr/bin/monit_init.sh
@@ -35,7 +35,6 @@ RUN echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.14/main >> /etc/apk/repo
  && wget -P /tmp/v2r -O /tmp/v2r/v2r.zip `printf "${V2RAY_ZIP_URL}" ${V2RAY_VERSION}` \
  && unzip /tmp/v2r/v2r.zip -d /tmp/v2r/ \
  && install -Dm755 /tmp/v2r/v2ray /usr/bin/v2ray \
- && install -Dm755 /tmp/v2r/v2ctl /usr/bin/v2ctl \
  && install -Dm755 /tmp/v2r/geoip.dat ${V2RAY_LOCATION_ASSET}/geoip.dat \
  && install -Dm644 /tmp/v2r/geosite.dat ${V2RAY_LOCATION_ASSET}/geosite.dat \
  && install -Dm644 /tmp/v2r/config.json ${V2RAY_LOCATION_ASSET}/config.json \

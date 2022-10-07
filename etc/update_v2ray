@@ -17,7 +17,6 @@ if [[ "$V2RAY_NEW_VERSION" != "$V2RAY_VERSION" ]]; then
     if [ -f ${V2RAY_CACHE_ZIP} ]; then
         unzip ${V2RAY_CACHE_ZIP} -d /tmp/v2r/ \
         && install -Dm755 /tmp/v2r/v2ray /usr/bin/v2ray \
-        && install -Dm755 /tmp/v2r/v2ctl /usr/bin/v2ctl \
         && install -Dm755 /tmp/v2r/geoip.dat ${V2RAY_LOCATION_ASSET}/geoip.dat \
         && install -Dm644 /tmp/v2r/geosite.dat ${V2RAY_LOCATION_ASSET}/geosite.dat \
         && install -Dm644 /tmp/v2r/config.json ${V2RAY_LOCATION_ASSET}/config.json
