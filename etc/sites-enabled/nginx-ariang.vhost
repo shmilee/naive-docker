@@ -9,8 +9,8 @@ server {
     listen  443 ssl http2;
     server_name ariang.{{domain-name}};
 
-    ssl_certificate       /srv/etc/ssl-certs/server-ariang.crt;
-    ssl_certificate_key   /srv/etc/ssl-certs/server-ariang.key;
+    ssl_certificate       /srv/etc/ssl-certs/server-www-ariang-jsproxy.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-www-ariang-jsproxy.key;
     access_log  /srv/log/nginx-ariang-access.log main buffer=32k flush=2m;
     error_log   /srv/log/nginx-ariang-error.log notice;
 

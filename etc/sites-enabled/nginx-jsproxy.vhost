@@ -78,8 +78,8 @@ server {
     listen                443 ssl http2;
     server_name           jsproxy.{{domain-name}};
 
-    ssl_certificate       /srv/etc/ssl-certs/server-jsproxy.crt;
-    ssl_certificate_key   /srv/etc/ssl-certs/server-jsproxy.key;
+    ssl_certificate       /srv/etc/ssl-certs/server-www-ariang-jsproxy.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-www-ariang-jsproxy.key;
     access_log            /srv/log/nginx-jsproxy.log log_proxy buffer=64k flush=1s;
     error_log             /srv/log/nginx-jsproxy-error.log notice;
 
