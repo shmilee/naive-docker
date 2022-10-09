@@ -11,6 +11,11 @@ chown www-data:www-data /srv/log/aria2.log
 touch /srv/log/v2ray-{access,error}.log
 chown nobody:nobody /srv/log/v2ray-access.log
 chown nobody:nobody /srv/log/v2ray-error.log
+for file in server-v2tls.key server-v2tls.crt; do
+    if [ -f "/srv/etc/ssl-certs/$file" ]; then
+        chown nobody:nobody /srv/etc/ssl-certs/$file
+    fi
+done
 
 if [ -x "/srv/etc/update_v2ray" ]; then
     /srv/etc/update_v2ray
