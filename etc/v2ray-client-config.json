@@ -70,12 +70,29 @@
       "mux": {"enabled": true}
     },
     {
+      "tag": "trojan-tls",
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "v2tls.{{domain-name}}",
+            "port": {{vport_troj}},
+            "password": "{{troj-password}}"
+          }
+        ]
+      },
+      "streamSettings": {
+          "network": "tcp",
+          "security": "tls"
+      }
+    },
+    {
       "tag": "ws-vmess",
       "protocol": "vmess",
       "settings": {
         "vnext": [
           {
-            "address": "v2ray.{{domain-name}}",
+            "address": "v2fly.{{domain-name}}",
             "port": 443,
             "users": [
               {
@@ -105,7 +122,8 @@
           "inboundTag": [
             "socks-8087"
           ],
-          "outboundTag": "simple-vmess"
+          //"outboundTag": "simple-vmess"
+          "outboundTag": "trojan-tls"
         },
         {
           "type": "field",

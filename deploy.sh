@@ -16,6 +16,7 @@ fi
 vport_init=$((RANDOM%5000+5000))
 vport_dmin=$((RANDOM%1000+10000))
 vport_dmax=$((RANDOM%1000+12000))
+vport_troj=$((vport_init+50))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
 ariang_ver=1.2.4
@@ -52,9 +53,11 @@ unzip -q ./AriaNg-$ariang_ver.zip -d $deploydir/http/ariang
 echo "==> edit v2ray config ..."
 uuid1=$(cat /proc/sys/kernel/random/uuid)
 uuid2=$(cat /proc/sys/kernel/random/uuid)
+tropass=$(cat /proc/sys/kernel/random/uuid | cut -d- -f1,3,5)
 sed -e "s|{{UUID_1}}|${uuid1}|" -e "s|{{UUID_2}}|${uuid2}|" \
     -e "s|{{ip-addr}}|$ipaddr|" -e "s|{{vport_init}}|$vport_init|" \
     -e "s|{{vport_dmin}}|$vport_dmin|" -e "s|{{vport_dmax}}|$vport_dmax|" \
+    -e "s|{{vport_troj}}|$vport_troj|" -e "s|{{troj-password}}|$tropass|" \
     -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" \
     -i $deploydir/etc/v2ray-{server,client}-config.json
 if [[ $dynamicport == 'on' ]]; then
@@ -97,14 +100,15 @@ sed -e "s|v2ray.$domain|$domain|" $deploydir/v2ray-client-config.json \
 echo "==> gen $deploydir/{test.sh,run.sh}"
 cat > $deploydir/test.sh <<'EOF'
 #!/bin/bash
-#    -v /usr/share/doc/python3/html:/usr/share/doc/python3/html \
 docker run --rm --name naive {{network-info}} \
+    -v /usr/share/doc/python3/html:/usr/share/doc/python3/html \
     -v $PWD:/srv:rw shmilee/naive:${1:-using}
 EOF
 if [[ $dynamicport == 'on' || $mkcp == 'on' ]]; then
     sed -e "s|{{network-info}}|--network=host|" -i $deploydir/test.sh
 else
-    sed -e "s|{{network-info}}|-p 80:80 -p 443:443 -p $vport_init:$vport_init|" -i $deploydir/test.sh
+    more_ports="-p $vport_init:$vport_init -p $vport_troj:$vport_troj"
+    sed -e "s|{{network-info}}|-p 80:80 -p 443:443 $more_ports|" -i $deploydir/test.sh
 fi
 sed 's|--rm|--detach --restart=always|'  $deploydir/test.sh > $deploydir/run.sh
 chmod +x $deploydir/{test.sh,run.sh}
@@ -115,7 +119,7 @@ mkdir $deploydir/log
 echo "==> Done."
 cat <<EOF
 
-Generate and put dhparam.pem server-{ariang,v2ray,www}.{crt,key} in $deploydir/etc/ssl-certs
+Generate and put dhparam.pem server-{www-ariang-jsproxy,v2fly}.{crt,key} in $deploydir/etc/ssl-certs
 Run test
     cd  $deploydir/
     ./test.sh [naive-image-tag]

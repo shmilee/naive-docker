@@ -64,7 +64,34 @@
     //dyp-  //mkcp-    }
     //dyp-  //mkcp-  }
     //dyp-  //mkcp-}
-    //dyp-},    
+    //dyp-},
+    {
+      "port": {{vport_troj}},
+      "protocol": "trojan",
+      "settings": {
+          "clients": [
+              {
+                  "password":"{{troj-password}}",
+                  "email": "loveee@vvv2fly.org"
+              }
+          ]
+      },
+      "streamSettings": {
+          "network": "tcp",
+          "security": "tls",
+          "tlsSettings": {
+              "alpn": [
+                  "http/1.1"
+              ],
+              "certificates": [
+                  {
+                      "certificateFile": "/srv/etc/ssl-certs/server-v2tls.crt",
+                      "keyFile": "/srv/etc/ssl-certs/server-v2tls.key"
+                  }
+              ]
+          }
+      }
+    },
     {
       "port": 44944,
       "listen": "127.0.0.1",
