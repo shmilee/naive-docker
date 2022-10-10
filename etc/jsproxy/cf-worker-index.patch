@@ -1,0 +1,47 @@
+diff -Nur cf-worker/index.js cf-worker-ws/index.js
+--- cf-worker/index.js	2019-07-26 22:48:00.000000000 +0800
++++ cf-worker-ws/index.js	2022-10-10 21:01:05.000000000 +0800
+@@ -69,12 +69,13 @@
+   if (path.startsWith('/http/')) {
+     return httpHandler(req, path.substr(6))
+   }
++  if (path.startsWith('/ws')) {
++    return wsHandler(req)
++  }
+ 
+   switch (path) {
+   case '/http':
+     return makeRes('请更新 cfworker 到最新版本!')
+-  case '/ws':
+-    return makeRes('not support', 400)
+   case '/works':
+     return makeRes('it works')
+   default:
+@@ -83,6 +84,27 @@
+   }
+ }
+ 
++/**
++ * @param {Request} req
++ */
++function wsHandler(req) {
++  const urlObj = new URL(req.url);
++  const origin = urlObj.searchParams.get('origin');
++  const targeturl = urlObj.searchParams.get('url__');
++
++  const headers = new Headers(req.headers);
++  origin !== undefined && headers.set('origin', origin);
++
++  return fetch(targeturl, {
++    method: req.method,
++    headers,
++    body: req.body,
++    redirect: 'follow',
++  }).catch((err) => {
++    console.log(err)
++    throw err;
++  });
++}
+ 
+ /**
+  * @param {Request} req

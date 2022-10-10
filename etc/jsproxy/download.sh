@@ -14,6 +14,8 @@ rm -f www.tar.gz
 # add scholar
 cp scholar.png jsproxy-$JSPROXY_VER/www/assets/ico/
 patch -b -p1 -d jsproxy-$JSPROXY_VER/www -i ../../www-index_v3.patch
+# edit cf-worker/index.js for /ws
+patch -b -p1 -d jsproxy-$JSPROXY_VER/cf-worker -i ../../cf-worker-index.patch
 
 # resty/?.lua
 wget -c -O lua-resty-string.tar.gz https://github.com/openresty/lua-resty-string/archive/refs/tags/v0.15.tar.gz
