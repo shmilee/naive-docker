@@ -41,7 +41,7 @@ mv $deploydir/etc/aria2.conf $deploydir/http/.aria2/
 touch $deploydir/http/.aria2/aria2.session
 auser=$(cat /proc/sys/kernel/random/uuid | cut -d- -f2,3)
 apass=$(cat /proc/sys/kernel/random/uuid | cut -d- -f1,5)
-printf "$auser:$(openssl passwd -crypt $apass)\n" > $deploydir/etc/http-passwd
+printf "$auser:$(openssl passwd $apass)\n" > $deploydir/etc/http-passwd
 echo -e "token: $aria2token\nuser: $auser\npasswd: $apass" > $deploydir/aria2-user-info
 if [ ! -f AriaNg-$ariang_ver.zip ]; then
     wget -c https://github.com/mayswind/AriaNg/releases/download/$ariang_ver/AriaNg-$ariang_ver.zip
@@ -83,7 +83,7 @@ cd $deploydir/etc/jsproxy
 cd "${old_PATH}"
 jwho=$(cat /proc/sys/kernel/random/uuid | cut -d- -f4)
 jkey=$(cat /proc/sys/kernel/random/uuid | cut -d- -f5)
-printf "$jwho:$(openssl passwd -crypt $jkey)\n" > $deploydir/etc/http-passwd-jsproxy
+printf "$jwho:$(openssl passwd $jkey)\n" > $deploydir/etc/http-passwd-jsproxy
 pass64=$(echo -n "$jwho:$jkey" | base64) # js btoa("$jwho:$jkey")
 sed -e "s|ASSET_URL = '.*etherdream.github.io.*'|ASSET_URL = 'https://jsproxy.$domain'|" \
     -e "s|fetch(ASSET_URL + path)|fetch(ASSET_URL + path, {headers:{'Authorization': 'Basic $pass64'}})|" \
