@@ -17,6 +17,13 @@ for file in server-v2tls.key server-v2tls.crt; do
     fi
 done
 
-if [ -x "/srv/etc/update_v2ray" ]; then
-    /srv/etc/update_v2ray
+/usr/bin/install_v2ray.sh "5.1.0"
+
+if [ ! -d "/srv/headscale" ]; then
+    mkdir /srv/headscale
 fi
+chown headscale:www-data /srv/headscale
+touch /srv/log/headscale.log
+chown headscale:www-data /srv/log/headscale.log
+
+/usr/bin/install_headscale.sh "0.17.0-beta4"
