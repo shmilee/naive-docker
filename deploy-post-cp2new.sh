@@ -18,8 +18,9 @@ echo ' ==> backup logs'
 cp_files "" 'backup-log-' '.tar.gz'
 echo ' ==> v2ray zip'
 cp_files "" 'v2ray-linux-64-v' '.zip'
-echo ' ==> headscale bin'
+echo ' ==> headscale'
 cp_files "" 'headscale_' '_linux_amd64'
+cp_files 'headscale/'
 echo ' ==> http-passwd'
 tail -n1 "$src"/etc/http-passwd >> "$dst"/etc/http-passwd
 tail -n1 "$src"/etc/http-passwd-jsproxy >> "$dst"/etc/http-passwd-jsproxy

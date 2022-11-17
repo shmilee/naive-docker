@@ -2,6 +2,7 @@
 20*-*-deploy
 ssl-t/*
 AriaNg-*.zip
+headscale-ui-*.zip
 dkjson.lua
 meiriyiwen-all.json
 */mryw/split-jsons/*.json

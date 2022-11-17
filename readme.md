@@ -55,6 +55,9 @@ bash ./deploy-post-cp2new.sh [src] [dst]
   - DNS record, `xxxx`
   - add route, `xxxx.yyy.zz/*`
 
+* headscale
+    - `docker exec naive headscale -c /srv/etc/headscale-config.yaml apikeys create`
+
 * download
   - aria2 token, user, passwd `20XX-XX-XX-deploydir/aria2-user-info`
   - v2ray client config `20XX-XX-XX-deploy/v2ray-client-config.json`

@@ -19,9 +19,6 @@ done
 
 /usr/bin/install_v2ray.sh "5.1.0"
 
-if [ ! -d "/srv/headscale" ]; then
-    mkdir /srv/headscale
-fi
 chown headscale:www-data /srv/headscale
 touch /srv/log/headscale.log
 chown headscale:www-data /srv/log/headscale.log

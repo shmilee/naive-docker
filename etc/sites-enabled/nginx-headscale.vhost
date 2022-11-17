@@ -15,8 +15,8 @@ server {
     listen  443 ssl http2;
     server_name headscale.{{domain-name}};
 
-    ssl_certificate       /srv/etc/ssl-certs/server-v2fly-headscale.crt;
-    ssl_certificate_key   /srv/etc/ssl-certs/server-v2fly-headscale.key;
+    ssl_certificate       /srv/etc/ssl-certs/server-headscale.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-headscale.key;
     access_log  /srv/log/nginx-headscale-access.log main buffer=32k flush=2m;
     error_log   /srv/log/nginx-headscale-error.log notice;
 
