@@ -70,7 +70,8 @@ fi
 mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 
 #4. headscale
-mkdir $deploydir/headscale
+mkdir -v $deploydir/headscale
+sed -i -e "s|{{domain-name}}|$domain|" $deploydir/etc/headscale-config.yaml
 if [ ! -f headscale-ui-$headscale_ui_ver.zip ]; then
     wget -O headscale-ui-$headscale_ui_ver.zip -c https://github.com/gurucomputing/headscale-ui/releases/download/$headscale_ui_ver/headscale-ui.zip
 fi
