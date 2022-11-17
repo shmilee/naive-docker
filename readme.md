@@ -1,12 +1,12 @@
 Intro
 =====
 
-Use **N**ginx, **A**r**I**a2, **V**2ray to get data from somewher**E**. "拿衣服"
+Use **N**ginx, **A**r**I**a2, **V**2ray, h**E**adscale to get data from somewhere. "拿衣服"
 
 docker image
 ============
 
-[mynginx](https://github.com/shmilee/web-in-docker/blob/master/dockerfiles/readme.md#build-packages) + aria2 + v2ray, also lua + json + redis
+[mynginx](https://github.com/shmilee/web-in-docker/blob/master/dockerfiles/readme.md#build-packages) + aria2 + v2ray + headscale, also lua + json + redis
 
 ### build image
 
@@ -19,8 +19,8 @@ docker tag shmilee/naive:$(date +%y%m%d) shmilee/naive:using
 docker push shmilee/naive:$(date +%y%m%d)
 ```
 
-deploy nginx, aria2 and v2ray
-=============================
+deploy naive
+=============
 
 ### clone repo
 
@@ -31,10 +31,10 @@ cd naive-docker/
 
 ### pre docker in vps
 
-example in debian 9, run as root
+example in debian 10, run as root
 
 ```
-bash ./pre-docker-debian9.sh
+bash ./pre-docker-debian10.sh
 ```
 
 ### deploy
