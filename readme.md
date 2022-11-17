@@ -31,10 +31,10 @@ cd naive-docker/
 
 ### pre docker in vps
 
-example in debian 10, run as root
+example in debian 11, run as root
 
 ```
-bash ./pre-docker-debian10.sh
+bash ./pre-docker-debian11.sh
 ```
 
 ### deploy
