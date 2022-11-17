@@ -19,7 +19,7 @@ vport_dmax=$((RANDOM%1000+12000))
 vport_troj=$((vport_init+50))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
-ariang_ver=1.2.4
+ariang_ver=1.3.2
 headscale_ui_ver=2022.11.05-beta
 jsproxy_ver=0.1.0
 
