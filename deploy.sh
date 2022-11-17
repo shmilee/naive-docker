@@ -20,7 +20,8 @@ vport_troj=$((vport_init+50))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
 ariang_ver=1.2.4
-JSPROXY_VER=0.1.0
+headscale_ui_ver=2022.11.05-beta
+jsproxy_ver=0.1.0
 
 if [ -d $deploydir ];then
     echo "Do yourself! sudo rm -rf $deploydir/"
@@ -68,7 +69,14 @@ if [[ $mkcp == 'on' ]]; then
 fi
 mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 
-#4. article
+#4. headscale
+if [ ! -f headscale-ui-$headscale_ui_ver.zip ]; then
+    wget -O headscale-ui-$headscale_ui_ver.zip -c https://github.com/gurucomputing/headscale-ui/releases/download/$headscale_ui_ver/headscale-ui.zip
+fi
+echo "==> extract headscale-ui files ..."
+unzip -q ./headscale-ui-$headscale_ui_ver.zip -d $deploydir/http/headscale-ui
+
+#5. article
 echo "==> add article files ..."
 cp -r article $deploydir/http/
 old_PATH="$(pwd)"
@@ -76,10 +84,10 @@ cd $deploydir/http/article/mryw/
 python3 ./meiriyiwen.py
 cd "${old_PATH}"
 
-#5. jsproxy
+#6. jsproxy
 echo "==> download jsproxy files ..."
 cd $deploydir/etc/jsproxy
-./download.sh $JSPROXY_VER
+./download.sh $jsproxy_ver
 cd "${old_PATH}"
 jwho=$(cat /proc/sys/kernel/random/uuid | cut -d- -f4)
 jkey=$(cat /proc/sys/kernel/random/uuid | cut -d- -f5)
@@ -87,7 +95,7 @@ printf "$jwho:$(openssl passwd $jkey)\n" > $deploydir/etc/http-passwd-jsproxy
 pass64=$(echo -n "$jwho:$jkey" | base64) # js btoa("$jwho:$jkey")
 sed -e "s|ASSET_URL = '.*etherdream.github.io.*'|ASSET_URL = 'https://jsproxy.$domain'|" \
     -e "s|fetch(ASSET_URL + path)|fetch(ASSET_URL + path, {headers:{'Authorization': 'Basic $pass64'}})|" \
-    $deploydir/etc/jsproxy/jsproxy-$JSPROXY_VER/cf-worker/index.js \
+    $deploydir/etc/jsproxy/jsproxy-$jsproxy_ver/cf-worker/index.js \
     > $deploydir/jsproxy-cf-worker-index.js
 echo -e "url: https://jsproxy.$domain\nuser: $jwho\npasswd: $jkey\ncf-worker-js: jsproxy-cf-worker-index.js" > $deploydir/jsproxy-info
 

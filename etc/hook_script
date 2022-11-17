@@ -25,5 +25,10 @@ fi
 chown headscale:www-data /srv/headscale
 touch /srv/log/headscale.log
 chown headscale:www-data /srv/log/headscale.log
+if [ ! -f "/srv/etc/headscale-config.yaml" ]; then
+    wget -O /srv/etc/headscale-config.yaml https://github.com/juanfont/headscale/raw/v0.17.0-beta4/config-example.yaml
+    sed -i -e 's|/var/lib/headscale/|/srv/headscale/|' -e 's|/var/run/|/srv/headscale/|' \
+        /srv/etc/headscale-config.yaml
+fi
 
 /usr/bin/install_headscale.sh "0.17.0-beta4"

@@ -54,6 +54,15 @@ check process v2ray matching "v2ray.*/srv/etc/v2ray-server-config.json"
     if cpu usage > 85% for 10 cycles then restart
     group proxy
 
+check process headscale matching "headscale.*serve"
+    start program = "/bin/bash -c 'nohup headscale -c /srv/etc/headscale-config.yaml serve >>/srv/log/headscale.log &'"
+        as uid headscale and gid www-data
+        with timeout 10 seconds
+    stop program = "/usr/bin/killall headscale"
+        as uid headscale and gid www-data
+    if failed port 8080 with timeout 10 seconds then restart
+    if 3 restarts within 3 cycles then alert
+    group tailnet
 
 #check process redis-server matching "redis-server.*daemonize"
 #    start program = "/usr/bin/redis-server --daemonize yes"
