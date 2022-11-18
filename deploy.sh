@@ -71,6 +71,17 @@ mv $deploydir/etc/v2ray-client-config.json $deploydir/v2ray-client-config.json
 
 #4. headscale
 mkdir -v $deploydir/headscale
+# Get new etc/headscale-config.yaml:
+# > wget -O ./etc/headscale-config.yaml https://github.com/juanfont/headscale/raw/v?.???/config-example.yaml
+# edit path, url:
+# > sed -i -e 's|/var/lib/headscale/|/srv/headscale/|' -e 's|/var/run/|/srv/headscale/|' ./etc/headscale-config.yaml
+# > sed -i 's|server_url: http://127.0.0.1:8080|server_url: https://headscale.{{domain-name}}|' ./etc/headscale-config.yaml
+# about ip_prefixes: IPv4 172.18.18.0/24
+# > sed -i '/ip_prefixes/{
+# > N
+# > N
+# > s|\(.*\n\)\(.*/48\)\n\(.*\) 100\.64.*|\1\3 172.18.18.0/24\n\2|
+# > }' ./etc/headscale-config.yaml 
 sed -i -e "s|{{domain-name}}|$domain|" $deploydir/etc/headscale-config.yaml
 if [ ! -f headscale-ui-$headscale_ui_ver.zip ]; then
     wget -O headscale-ui-$headscale_ui_ver.zip -c https://github.com/gurucomputing/headscale-ui/releases/download/$headscale_ui_ver/headscale-ui.zip

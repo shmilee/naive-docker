@@ -22,13 +22,5 @@ done
 chown headscale:www-data /srv/headscale
 touch /srv/log/headscale.log
 chown headscale:www-data /srv/log/headscale.log
-if [ ! -f "/srv/etc/headscale-config.yaml" ]; then
-    wget -O /srv/etc/headscale-config.yaml https://github.com/juanfont/headscale/raw/v0.17.0-beta4/config-example.yaml
-    sed -i -e 's|/var/lib/headscale/|/srv/headscale/|' \
-        -e 's|/var/run/|/srv/headscale/|' \
-        /srv/etc/headscale-config.yaml
-    echo ">> Edit server_url for client user by yourself."
-    echo ">> sed -i 's|server_url: http://127.0.0.1:8080|server_url: https://headscale.{{domain-name}}|' /srv/etc/headscale-config.yaml"
-fi
 
 /usr/bin/install_headscale.sh "0.17.0-beta4"
