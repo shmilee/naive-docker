@@ -33,6 +33,12 @@ cd naive-docker/
 
 example in debian 11, run as root
 
+* Note: install new kernel to FIX: vps modprobe: ERROR:
+    could not insert 'br_netfilter': Key was rejected by service
+  - apt-get update
+  - `apt-get install linux-image-5.10.0-19-amd64`
+  - reboot
+
 ```
 bash ./pre-docker-debian11.sh
 ```

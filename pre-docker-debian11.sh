@@ -11,13 +11,11 @@ apt-get update
 apt-cache policy docker-ce
 apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 systemctl status docker # should enabled
-# install new kernel to FIX: vps modprobe: ERROR:
-#   could not insert 'br_netfilter': Key was rejected by service
-apt-get install linux-{image,headers}-5.10.0-19-amd64
 echo "==> pull shmilee/naive"
 docker pull shmilee/naive:${1:-221116}
 docker tag shmilee/naive:${1:-221116} shmilee/naive:using
 echo "==> add other pkgs"
-apt-get install net-tools command-not-found \
+apt-get install net-tools nethogs command-not-found \
     git unzip tig htop zsh vim python3-doc python3-pip
+apt update
 pip3 install --user pypinyin opencc
