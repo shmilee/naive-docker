@@ -14,8 +14,23 @@ server {
     access_log  /srv/log/nginx-v2ws-access.log main buffer=32k flush=2m;
     error_log   /srv/log/nginx-v2ws-error.log notice;
 
-    location / {
+    location /sswd {
         root   /srv/http/sswd-test;
         index  index.html;
+    }
+
+    location / {
+        auth_basic "Apples and oranges for 8000.";
+        auth_basic_user_file /srv/etc/http-passwd;
+        proxy_redirect off;
+        proxy_pass http://172.17.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+
+        # Show realip in access.log
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
