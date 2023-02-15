@@ -95,6 +95,7 @@ cp -r article $deploydir/http/
 old_PATH="$(pwd)"
 cd $deploydir/http/article/mryw/
 python3 ./meiriyiwen.py
+rm -rf ./split-jsons/
 cd "${old_PATH}"
 
 #6. jsproxy

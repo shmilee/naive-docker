@@ -10,6 +10,7 @@ import requests
 import contextlib
 import json
 import difflib
+from gdpy3._json import JsonLines
 
 try:
     import opencc
@@ -94,8 +95,12 @@ def main(output, start=(2011, 3, 8), stop=(2020, 9, 9), dt=3):
             json.dump(results, out, ensure_ascii=False)
 
 
-def split_json(file, outdir='./split-jsons', uri='/article?key='):
-    '''Read results in source file, save them to outdir/{date,title}-names.'''
+def split_json(file, outdir='./split-jsons', uri='/article?key=',
+               save_jsonline='./mryw-all.jsonl'):
+    '''
+    Read results in source file, save them to outdir/{date,title}-names.
+    And save results to jsonlines file.
+    '''
     if not os.path.exists(file):
         print("[Error] %s not found!" % file)
         return
@@ -144,13 +149,13 @@ def split_json(file, outdir='./split-jsons', uri='/article?key='):
 
     def _write_data(day, daylinks, titlelinks):
         output = '%s/%s.json' % (outdir, day)
+        u_dates.append(day)
         if os.path.isfile(output):
             print("[Info] %s exists." % output)
-            return
-        with open(output, 'w', encoding='utf8') as out:
-            # print("[Info] Writting %s ..." % output)
-            json.dump(dict(data=results[day]), out, ensure_ascii=False)
-        u_dates.append(day)
+        else:
+            with open(output, 'w', encoding='utf8') as out:
+                # print("[Info] Writting %s ..." % output)
+                json.dump(dict(data=results[day]), out, ensure_ascii=False)
         l_dates.extend(daylinks)
         l_titles.extend(titlelinks)
         for ln in daylinks + titlelinks:
@@ -249,6 +254,25 @@ def split_json(file, outdir='./split-jsons', uri='/article?key='):
         print("[Info] Writting (%d/%d) link-dates ..." % (len(l_dates), L))
         print("[Info] Writting (%d/%d) link-titles ..." % (len(l_titles), L))
         json.dump(['index', 'toc'] + sorted(keys), out, ensure_ascii=False)
+
+    if save_jsonline:
+        jlpath = save_jsonline  # os.path.join(outdir, save_jsonline)
+        if os.path.isfile(jlpath):
+            print("[Info] Remove old %s." % jlpath)
+            os.remove(jlpath)
+        jl = JsonLines(jlpath)
+        u_records = {}
+        for k in ['index', 'toc'] + u_dates:
+            with open('%s/%s.json' % (outdir, k), 'r', encoding='utf8') as f:
+                u_records[k] = json.load(f)
+        print("[Info] Writting dates to %s ..." % jlpath)
+        jl.update(u_records)
+        l_records = {}  # link records : {__LINK__: another index key}
+        for k in l_dates + l_titles:
+            dest = os.readlink('%s/%s.json' % (outdir, k))
+            l_records[k] = dict(__LINK__=dest[:-5])  # rm ext .json
+        print("[Info] Writting link dates/titles to %s ..." % jlpath)
+        jl.update(l_records)
 
 
 if __name__ == '__main__':
