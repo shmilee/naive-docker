@@ -22,7 +22,7 @@
 ---------------------------------------------------------------------------
 
 local io = { open=io.open }
-local math = { min=math.min, max=math.max }
+local math = { min=math.min, max=math.max, floor=math.floor }
 local table = { insert=table.insert }
 local string = { gsub=string.gsub }
 local type, pairs, tostring = type, pairs, tostring
@@ -39,7 +39,7 @@ function jsonlines:set_index()
     if f then
          -- ref: http://www.lua.org/manual/5.4/manual.html#pdf-io.open
         self.size = f:seek("end")
-        local step = math.min(math.max(128, self.size//1024), 4096*8)
+        local step = math.min(math.max(128, math.floor(self.size/1024)), 4096*8)
         local offset = f:seek("end", -step-1)
         local str = f:read(step)
         while (str ~= nil and str:find('\n') == nil  -- not found & pos>0
@@ -55,7 +55,7 @@ function jsonlines:set_index()
         end
         f:close()
         --print( 'Get ' .. data:sub(0,2^6) .. ' .... ' .. data:sub(-2^6))
-        data, pos, err = json.decode(data, 1, nil)
+        data, pos, err = json.decode(data)  -- , 1, nil) for dkjson
         if not err and type(data) == "table" then
             self.index = data
             self.N = data["__RecordCount__"] or 0
@@ -125,7 +125,7 @@ end
 
 function jsonlines.json_decode(raw)
     if raw then
-        local rc, pos, err = json.decode(raw, 1, nil)
+        local rc, pos, err = json.decode(raw)
         if not err then
             return rc
         end
