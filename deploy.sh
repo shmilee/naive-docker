@@ -19,8 +19,8 @@ vport_dmax=$((RANDOM%1000+12000))
 vport_troj=$((vport_init+50))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
-ariang_ver=1.3.2
-headscale_ui_ver=2022.11.05-beta
+ariang_ver=1.3.3
+headscale_ui_ver='2023.01.30-beta-1'
 jsproxy_ver=0.1.0
 
 if [ -d $deploydir ];then

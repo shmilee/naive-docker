@@ -17,10 +17,10 @@ for file in server-v2tls.key server-v2tls.crt; do
     fi
 done
 
-/usr/bin/install_v2ray.sh "5.1.0"
+/usr/bin/install_v2ray.sh "5.3.0"
 
 chown headscale:www-data /srv/headscale
 touch /srv/log/headscale.log
 chown headscale:www-data /srv/log/headscale.log
 
-/usr/bin/install_headscale.sh "0.17.0-beta4"
+/usr/bin/install_headscale.sh "0.20.0"
