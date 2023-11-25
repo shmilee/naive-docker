@@ -19,7 +19,7 @@ vport_dmax=$((RANDOM%1000+12000))
 vport_troj=$((vport_init+50))
 v2raypath=$(mktemp -p download/huge -t 'dataid=XXXXXXXXXX' -u)
 deploydir="$(date +%F)-deploy"
-ariang_ver=1.3.3
+ariang_ver=1.3.6
 headscale_ui_ver='2023.01.30-beta-1'
 jsproxy_ver=0.1.0
 
@@ -122,15 +122,15 @@ sed -e "s|v2ray.$domain|$domain|" $deploydir/v2ray-client-config.json \
 echo "==> gen $deploydir/{test.sh,run.sh}"
 cat > $deploydir/test.sh <<'EOF'
 #!/bin/bash
-docker run --rm --name naive {{network-info}} \
+docker run --rm --name naive {{network-opt}} \
     -v /usr/share/doc/python3/html:/usr/share/doc/python3/html \
     -v $PWD:/srv:rw shmilee/naive:${1:-using}
 EOF
 if [[ $dynamicport == 'on' || $mkcp == 'on' ]]; then
-    sed -e "s|{{network-info}}|--network=host|" -i $deploydir/test.sh
+    sed -e "s|{{network-opt}}|--network=host|" -i $deploydir/test.sh
 else
     more_ports="-p $vport_init:$vport_init -p $vport_troj:$vport_troj"
-    sed -e "s|{{network-info}}|-p 80:80 -p 443:443 $more_ports|" -i $deploydir/test.sh
+    sed -e "s|{{network-opt}}|-p 80:80 -p 443:443 $more_ports|" -i $deploydir/test.sh
 fi
 sed 's|--rm|--detach --restart=always|'  $deploydir/test.sh > $deploydir/run.sh
 chmod +x $deploydir/{test.sh,run.sh}
