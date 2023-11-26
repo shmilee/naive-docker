@@ -22,8 +22,8 @@ echo ' ==> headscale'
 cp_files "" 'headscale_' '_linux_amd64'
 cp_files 'headscale/'
 echo ' ==> http-passwd'
-tail -n1 "$src"/etc/http-passwd >> "$dst"/etc/http-passwd
-tail -n1 "$src"/etc/http-passwd-jsproxy >> "$dst"/etc/http-passwd-jsproxy
+sed -n '2,$p' "$src"/etc/http-passwd >> "$dst"/etc/http-passwd
+sed -n '2,$p' "$src"/etc/http-passwd-jsproxy >> "$dst"/etc/http-passwd-jsproxy
 echo ' ==> ssl-certs'
 cp_files 'etc/ssl-certs/'
 echo ' ==> aria2 download files'
