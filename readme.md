@@ -12,7 +12,7 @@ docker image
 
 * Repository `shmilee.io` for mynginx in Dockerfile only works in my pc!
 
-```
+```bash
 cd ./dockerfile/
 docker build --force-rm --no-cache --rm -t shmilee/naive:$(date +%y%m%d) .
 docker tag shmilee/naive:$(date +%y%m%d) shmilee/naive:using
@@ -26,7 +26,7 @@ deploy naive
 
 example in debian 11+, run as root
 
-```
+```bash
 bash <(curl -Lso- https://github.com/shmilee/naive-docker/raw/master/prepare-debian11+.sh)
 ```
 
@@ -37,7 +37,7 @@ bash <(curl -Lso- https://github.com/shmilee/naive-docker/raw/master/prepare-deb
 
 ### deploy
 
-```
+```bash
 cd naive-docker/
 bash ./deploy.sh ip-addr [domain]
 ls "$(date +%F)-deploy"
@@ -50,12 +50,23 @@ bash ./deploy-post-cp2new.sh [src] [dst]
   - self-signed, Full
   - valid & trusted by Cloudflare, Full (strict)
 
+```bash
+# web-in-docker/other_tools/gen-CA-crt/gen-crt.sh
+gen-crt.sh server domainxxx-whatyyy
+# about SAN subjectAltName: `DNS:what1.domainxxx,DNS:what2.domainxxx
+# about Common Name: `whatall.domainxxx`
+```
+
 * Note: [Cloudflare worker routes for jsproxy](https://developers.cloudflare.com/workers/platform/routing/routes)
   - DNS record, `xxxx`
   - add route, `xxxx.yyy.zz/*`
 
 * headscale
     - `docker exec naive headscale -c /srv/etc/headscale-config.yaml apikeys create`
+
+* ChatGPT web
+    - deploy by docker image
+    - modify the corresponding ip:port in `$(date +%F)-deploy/etc/sites-enabled/nginx-chat.vhost`
 
 * download
   - aria2 token, user, passwd `20XX-XX-XX-deploydir/aria2-user-info`
@@ -71,7 +82,7 @@ bash ./deploy-post-cp2new.sh [src] [dst]
 
 * `HE ipv6 tunnel` script to `/etc/rc.local`
 * `etc-docker-daemon.json`:
-  ```
+  ```json
   {
     "ipv6": true,
     "fixed-cidr-v6": "Tunnel_detail, Routed IPv6 Prefixes, 2001:470:x:y::/64"
@@ -84,7 +95,7 @@ bash ./deploy-post-cp2new.sh [src] [dst]
 
 * install
 
-```
+```bash
 wget -N https://gitlab.com/fscarmen/warp/-/raw/main/menu.sh && bash menu.sh d
 ```
 
