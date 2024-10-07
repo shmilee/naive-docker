@@ -9,8 +9,8 @@ server {
     listen  443 ssl http2;
     server_name chat.{{domain-name}};
 
-    ssl_certificate       /srv/etc/ssl-certs/server-chat.crt;
-    ssl_certificate_key   /srv/etc/ssl-certs/server-chat.key;
+    ssl_certificate       /srv/etc/ssl-certs/server-web.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-web.key;
     access_log  /srv/log/nginx-chat-access.log main buffer=32k flush=1m;
     error_log   /srv/log/nginx-chat-error.log notice;
 

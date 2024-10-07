@@ -14,8 +14,8 @@ server {
     listen  443 ssl http2;
     server_name v2fly.{{domain-name}};
 
-    ssl_certificate       /srv/etc/ssl-certs/server-v2fly.crt;
-    ssl_certificate_key   /srv/etc/ssl-certs/server-v2fly.key;
+    ssl_certificate       /srv/etc/ssl-certs/server-net.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-net.key;
     access_log  /srv/log/nginx-v2ray-access.log main buffer=32k flush=2m;
     error_log   /srv/log/nginx-v2ray-error.log notice;
 
