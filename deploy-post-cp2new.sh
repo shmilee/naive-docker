@@ -28,7 +28,3 @@ echo ' ==> ssl-certs'
 cp_files 'etc/ssl-certs/'
 echo ' ==> aria2 download files'
 cp_files "http/aria2-download/"
-echo ' ==> x2zl jsonl files'
-path='http/article/x2zl/files'
-[ -d "$dst"/$path ] || mkdir -pv "$dst"/$path
-cp_files "$path/"
