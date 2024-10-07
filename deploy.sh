@@ -33,6 +33,8 @@ cp -r etc $deploydir/
 
 #1. nginx
 sed -i -e "s|{{domain-name}}|$domain|" -e "s|{{v2raypath}}|$v2raypath|" $deploydir/etc/sites-enabled/nginx-*.vhost
+# AUR repo
+mkdir -pv  $deploydir/repo-shmilee
 
 #2. aria2
 mkdir -pv $deploydir/http/{.aria2,aria2-download,ariang}

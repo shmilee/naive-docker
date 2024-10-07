@@ -28,3 +28,5 @@ echo ' ==> ssl-certs'
 cp_files 'etc/ssl-certs/'
 echo ' ==> aria2 download files'
 cp_files "http/aria2-download/"
+echo ' ==> repo-shmilee'
+cp_files "repo-shmilee/"
