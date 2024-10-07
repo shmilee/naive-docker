@@ -23,4 +23,4 @@ chown headscale:www-data /srv/headscale
 touch /srv/log/headscale.log
 chown headscale:www-data /srv/log/headscale.log
 
-/usr/bin/install_headscale.sh "0.23.0"
+/usr/bin/install_headscale.sh "0.22.3"
