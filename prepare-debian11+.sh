@@ -14,8 +14,8 @@ apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 systemctl --no-pager --full status docker  # should enabled
 
 echo -e "\n==> 2) pull shmilee/naive"
-docker pull shmilee/naive:${1:-221116}
-docker tag shmilee/naive:${1:-221116} shmilee/naive:using
+docker pull shmilee/naive:${1:-241008}
+docker tag shmilee/naive:${1:-241008} shmilee/naive:using
 
 echo -e "\n==> 3) add some packages"
 apt-get install openssh-server net-tools nethogs command-not-found \
