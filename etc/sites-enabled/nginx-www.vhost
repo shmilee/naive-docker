@@ -19,6 +19,18 @@ server {
         index  index.html index.htm;
     }
 
+    # AUR repo
+    location ^~ /repo-shmilee {
+        alias /srv/repo-shmilee;
+        autoindex on;
+        autoindex_exact_size off;
+        autoindex_localtime on;
+        include    /etc/mynginx/mime.types;
+        types {
+            text/plain  log;
+        }
+    }
+
     location /status {
         stub_status on;
         access_log on;
