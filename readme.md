@@ -10,7 +10,7 @@ docker image
 
 ### build image
 
-* Repository `shmilee.io` for mynginx in Dockerfile only works in my pc!
+* Repository for mynginx in Dockerfile only works in my pc!
 
 ```bash
 cd ./dockerfile/

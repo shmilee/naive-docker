@@ -13,7 +13,7 @@ ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
 
 # Add my repository
 COPY ./*@*.rsa.pub /etc/apk/keys/
-RUN echo http://shmilee.io/repo-shmilee/alpine-v3.16/shmilee > /etc/apk/repositories
+RUN echo https://www.space2024.xyz/repo-shmilee/alpine-v3.16/shmilee > /etc/apk/repositories
 
 RUN echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.16/main >> /etc/apk/repositories \
  && echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.16/community >> /etc/apk/repositories \
@@ -29,9 +29,9 @@ RUN echo https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.16/main >> /etc/apk/repo
 COPY ./monit_init.sh ./install_v2ray.sh ./install_headscale.sh /usr/bin/
 RUN echo "==> monit_init install_v2ray install_headscale ..." \
  && chmod +x /usr/bin/monit_init.sh /usr/bin/install_v2ray.sh /usr/bin/install_headscale.sh \
- && mkdir -p /etc/v2ray /etc/headscale /var/lib/headscale \
- && adduser -u 532 -D -S -h /srv/headscale -s /usr/bin/nologin -G www-data -g www-data headscale \
- && chown headscale:www-data /var/lib/headscale
+ && mkdir -p /etc/v2ray /etc/headscale /var/lib/headscale /var/run/headscale \
+ && adduser -u 532 -D -S -h /srv/headscale -s /sbin/nologin -G www-data -g www-data headscale \
+ && chown headscale:www-data /var/lib/headscale /var/run/headscale
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["monit_init.sh", "5"]
