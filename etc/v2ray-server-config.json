@@ -85,8 +85,8 @@
               ],
               "certificates": [
                   {
-                      "certificateFile": "/srv/etc/ssl-certs/server-net.crt",
-                      "keyFile": "/srv/etc/ssl-certs/server-net.key"
+                      "certificateFile": "/srv/etc/ssl-certs/server-v2tls.crt",
+                      "keyFile": "/srv/etc/ssl-certs/server-v2tls.key"
                   }
               ]
           }
