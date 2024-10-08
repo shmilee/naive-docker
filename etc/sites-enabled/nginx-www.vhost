@@ -27,7 +27,7 @@ server {
         fancyindex_localtime on;
         include    /etc/mynginx/mime.types;
         types {
-            text/plain  log;
+            text/plain  log md;
         }
     }
 
