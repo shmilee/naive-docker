@@ -1,0 +1,65 @@
+###############################################################################
+## Global section
+###############################################################################
+##
+## Start Monit in the foreground, required to run Monit from init
+set init
+set daemon 30 # specify the poll cycle
+
+set logfile /srv/log/monit.log # log file
+set pidfile /run/monit.pid     # pid file, default $HOME/.monit.pid
+set idfile  /run/monit.id      # id file, default $HOME/.monit.id
+set statefile /run/monit.state # state file, default $HOME/.monit.state
+
+set eventqueue
+    basedir /run/monit  # base directory where events will be stored
+
+set httpd port 2812
+    use address 127.0.0.1
+    allow 127.0.0.1
+    allow admin:'adminpassword' #read-only
+
+###############################################################################
+## Services
+###############################################################################
+##
+check system $HOST
+    if cpu usage (user) > 80% for 5 cycles then alert
+    if loadavg(5min) > 5  then alert
+    if memory usage > 80% for 5 cycles then alert
+    group server
+
+check process nginx with pidfile /run/nginx.pid
+    start program = "/usr/sbin/nginx -c /srv/etc/nginx.conf"
+        with timeout 10 seconds
+    stop program  = "/usr/sbin/nginx -c /srv/etc/nginx.conf -s quit"
+    if 3 restarts within 3 cycles then alert
+    group webserver
+
+check process aria2c matching "aria2c.*daemon"
+    start program = "/usr/bin/aria2c --daemon true"
+        as uid 500 and gid www-data
+        with timeout 10 seconds
+    stop program = "/usr/bin/killall aria2c"
+        as uid 500 and gid www-data
+    if failed port 6800 with timeout 10 seconds then restart
+    if 3 restarts within 3 cycles then alert
+    group webserver
+
+check process v2ray matching "v2ray.*/srv/etc/v2ray-server-config.json"
+    start program = "/bin/bash -c 'nohup v2ray run -config /srv/etc/v2ray-server-config.json >/dev/null &'"
+        as uid nobody and gid nobody
+    stop program = "/usr/bin/killall v2ray"
+        as uid nobody and gid nobody
+    if cpu usage > 80% for 10 cycles then restart
+    group proxy
+
+#check process redis-server matching "redis-server.*daemonize"
+#    start program = "/usr/bin/redis-server --daemonize yes"
+#        as uid nobody and gid nobody
+#        with timeout 10 seconds
+#    stop program = "/usr/bin/redis-cli shutdown"
+#        as uid nobody and gid nobody
+#    if failed port 6379 protocol redis with timeout 10 seconds then restart
+#    if 3 restarts within 3 cycles then alert
+#    group database

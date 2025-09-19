@@ -1,0 +1,44 @@
+server {
+    listen       80;
+    listen       [::]:80;
+    server_name  aria2.{{domain-name}};
+    # enforce https
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen  443 ssl http2;
+    listen  [::]:443 ssl http2;
+    server_name aria2.{{domain-name}};
+
+    ssl_certificate       /srv/etc/ssl-certs/server-adf.crt;
+    ssl_certificate_key   /srv/etc/ssl-certs/server-adf.key;
+    access_log  /srv/log/nginx-aria2-access.log main buffer=32k flush=1m;
+    error_log   /srv/log/nginx-aria2-error.log notice;
+
+    location / {
+        root   /srv/http/ariang;
+        index  index.html;
+    }
+
+    location ^~ /aria2-download {
+        auth_basic "Apples and oranges for ariang.";
+        auth_basic_user_file /srv/etc/http-passwd;
+        root  /srv/http;
+        fancyindex on;
+        fancyindex_exact_size off;
+        fancyindex_localtime on;
+        include    /etc/nginx/mime.types;
+    }
+
+    location /aria2-jsonrpc {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:6800/jsonrpc;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

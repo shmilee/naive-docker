@@ -1,5 +1,6 @@
 ~
 20*-*-deploy
+20*-*-deploy-srv
 ssl-t/*
 AriaNg-*.zip
 headscale-ui-*.zip
